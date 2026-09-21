@@ -41,7 +41,7 @@ across evolutions remains future work.
 ## LMCS draft 2 (2026-09-22)
 
 `document/`: the paper restructured for Logical Methods in Computer Science
-(official `lmcs.cls`, alphaurl, 31 pages), standalone for readers who know
+(official `lmcs.cls`, alphaurl, 36 pages), standalone for readers who know
 setoid rewriting / type theory / proof assistants. See `document/README.md`.
 
 Results added while writing it:

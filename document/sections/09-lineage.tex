@@ -17,6 +17,8 @@ $\mathsf{WF}(g)$ holds iff: (1) $\mathsf{nodes}(g)$ is duplicate-free; (2) every
 \end{description}
 $\mathsf{LineagePasses}(g) :\equiv \mathsf{WF}(g) \wedge \mathrm{L1} \wedge \mathrm{L2} \wedge \mathrm{L3}$.
 \end{defi}
+\paragraph{Status of L1--L3.} These conditions are \emph{declared specifications}, not derived results. They formalise three intelligible requirements on what it means for a seam valuation to be grounded independently of the coordinates it grounds: it must not descend from them (L1), any ancestry it shares with them must be disclosed (L2), and it must draw on at least one claim-relevant source that they do not (L3). We do not prove that they are necessary or sufficient for every adequate notion of grounding, and a different regime could adopt different conditions. What is proved is what the calculus needs of them: the copy pattern of \cref{sec:example} violates L1, and the checker below decides exactly these conditions.
+
 A passing verdict applies only to the declared graph \emph{and} its declared coverage: a partial record must not be reported as globally lineage-grounded. In the running example the ground $\gamma$ of the copied graph descends from $d_A$, so it violates L1.
 
 \subsection{Ancestor saturation}

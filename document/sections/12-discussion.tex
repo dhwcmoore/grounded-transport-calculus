@@ -29,7 +29,7 @@ Identity and associativity hold up to the crossing-sequence equivalence, not by 
 The equality concluded by seam transport needs only extensional agreement; grounding strengthens its warrant, not its algebraic conclusion (\cref{sec:seams}).
 
 \paragraph{The audit boundary.}
-The Coq checker is proved to reflect its specification; the handwritten OCaml audit is tested against it, not proved equivalent (\cref{sec:regression}), and its decision core has not been replaced by the extracted checker. The stratified test graphs are shallow (\cref{tab:mutants}, M12).
+The Coq checker is proved to reflect its specification; the handwritten OCaml audit is tested against it, not proved equivalent (\cref{sec:regression}), and its decision core has not been replaced by the extracted checker. The shallow stratified populations do not detect the bounded-saturation mutants M12 and M13; the added deep populations detect both, and the combined stratified suite detects all thirteen mutants (\cref{tab:mutants}).
 
 \paragraph{Scope of the model.}
 Valuations are Boolean; a general value space with a value transport is used only in the statement of valuation naturality. Maintenance and authority evidence are abstract. No rewriting tactic is provided, and no empirical claim is made: the examples are separating models showing that distinctions are real, not evidence of usability or scalability on production systems.

@@ -67,7 +67,7 @@ Contexts are treated at two levels: crossing-proper contexts preserve certified 
 Instantiated on grounded seams, the calculus recovers an earlier seam-transport theorem, separates structural naturality from preservation of grounding, and yields located obstructions to substitution.
 Assessment is problem-indexed and three-valued (certified, refuted, open), retains every located failure, and treats missing evidence as unresolved rather than refuted.
 A finite lineage audit is proved to reflect its specification, and its extraction issues kernel-checked certificates.
-The development is mechanised in Coq, axiom-free in its kernel; extraction to OCaml shows that certificates, lineage graphs and obstructions survive proof erasure, and differential testing, including a mutation study, compares the extracted audit with a handwritten one.
+The development is mechanised in Coq; the main development is axiom-free, and one isolated, non-imported functional converse uses classical choice. Extraction to OCaml shows that certificates, lineage graphs and obstructions survive proof erasure, and differential testing, including a mutation study, compares the extracted audit with a handwritten one.
 The calculus does not establish that declared records are complete or accurate; it makes precisely explicit what is being declared.
 \end{abstract}
 
