@@ -1,0 +1,35 @@
+\section{Discussion and limitations}\label{sec:limitations}
+
+\subsection{Processual motivation}\label{sec:whitehead}
+The calculus was motivated by a reading of process philosophy in which settled endpoints correspond to coordinate description, while the transition that produced them has a character that endpoint agreement does not exhaust \cite{whitehead1929}. The formal calculus does not encode any ontology and should not be read as doing so. It formalises one methodological consequence: \emph{endpoint agreement does not exhaust the evidence relevant to a processual transition}. The fuller philosophical treatment, including a taxonomy of warrant obligations, is in an earlier manuscript by the author \cite{moore2026}. The results of this paper stand on the need to retain process and provenance evidence, and do not depend on accepting that metaphysics.
+
+\subsection{Limitations}
+\paragraph{Declared-graph limitation.}
+A lineage certificate proves properties of the \emph{declared} graph. It does not prove that the graph contains every real production path, and the audit cannot detect a path the record omits.
+
+\paragraph{Raw inputs and state models.}
+The calculus can identify claim-relevant raw inputs without proving that they accurately record the concrete process, and cannot show that the state model adequately represents the target.
+
+\paragraph{Institutional limitation.}
+Authority and custodianship can be represented as data, but their legitimacy and competence are not established internally; the rule system is an input. Exhibition conditions concerning the declared process, coverage and custodian are recorded, not verified.
+
+\paragraph{Decidability.}
+General transport obligations need not be decidable; the open assessment is essential, not an implementation inconvenience.
+
+\paragraph{Coverage.}
+Preservation on the image of an evolution does not certify new target states outside that image (\cref{thm:coverage}).
+
+\paragraph{Certificate-level preservation needs an evidence lift.}
+Seam evolutions are crossing-proper given preservation of grounding on the image. They are certificate-proper only under an evidence lift (\cref{def:pm}), which we supply by reissuing certificates in one model and show cannot exist in another (\cref{thm:reissue}). A general theory of maintaining exhibition records, lineage and coverage across evolutions, rather than reissuing them, is not developed (\cref{rem:crossinglevel}).
+
+\paragraph{Witness algebra and composition.}
+Identity and associativity hold up to the crossing-sequence equivalence, not by literal equality (\cref{thm:algebra}). In a single seam, composition of non-identity crossing witnesses is degenerate (\cref{rem:degenerate}).
+
+\paragraph{The endpoint theorem is extensional.}
+The equality concluded by seam transport needs only extensional agreement; grounding strengthens its warrant, not its algebraic conclusion (\cref{sec:seams}).
+
+\paragraph{The audit boundary.}
+The Coq checker is proved to reflect its specification; the handwritten OCaml audit is tested against it, not proved equivalent (\cref{sec:regression}), and its decision core has not been replaced by the extracted checker. The stratified test graphs are shallow (\cref{tab:mutants}, M12).
+
+\paragraph{Scope of the model.}
+Valuations are Boolean; a general value space with a value transport is used only in the statement of valuation naturality. Maintenance and authority evidence are abstract. No rewriting tactic is provided, and no empirical claim is made: the examples are separating models showing that distinctions are real, not evidence of usability or scalability on production systems.

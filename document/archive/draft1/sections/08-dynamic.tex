@@ -1,0 +1,61 @@
+\section{Dynamic grounded transport}\label{sec:dynamic}
+
+The synchronic grounding of \cref{sec:seams} concerns one stage. This section asks what survives when the system evolves. The answer separates four notions that are easily conflated: structural naturality, valuation naturality, preservation of grounding, and coverage.
+
+\subsection{Structural seam evolution}
+A seam evolution from stage $t$ to $u$ consists of maps $U^\Sigma_{t,u}$, $U^A_{t,u}$, $U^B_{t,u}$ on the seam and the two coordinates such that the squares commute:
+\[
+\back_u \circ U^\Sigma_{t,u} = U^A_{t,u} \circ \back_t, \qquad
+\fwd_u \circ U^\Sigma_{t,u} = U^B_{t,u} \circ \fwd_t.
+\]
+Evolutions have identity and composition. We recover both from the earlier supplement, and show that the state map of a composite evolution agrees pointwise with the composite of state maps (\coq{evo_state_id}, \coq{evo_state_compose}), so the composite evolution and \coq{gp_comp} of the steps act identically.
+
+\subsection{Structural versus valuational naturality}
+The commuting squares say nothing about valuations. If the value spaces carry a transport $U^V_{t,u}$, one may additionally require all three valuations to be natural:
+\[
+\Phi_{A,u} \circ U^A_{t,u} = U^V_{t,u} \circ \Phi_{A,t}, \quad
+\Phi_{B,u} \circ U^B_{t,u} = U^V_{t,u} \circ \Phi_{B,t}, \quad
+\Phi_{\Sigma,u} \circ U^\Sigma_{t,u} = U^V_{t,u} \circ \Phi_{\Sigma,t}.
+\]
+We do not require the values to stay unchanged: a dynamic predicate may change while remaining coherently transported. Requiring $U^V = \mathrm{id}$ would turn a dynamic predicate into a temporal invariant.
+
+\subsection{Preservation on the image}
+Define $\mathsf{PreservesGroundingOnImage}(U)$: for every seam element $r$, grounding at $t$ implies grounding at $U^\Sigma_{t,u}(r)$. It concerns only seam elements \emph{of the form} $U^\Sigma_{t,u}(r)$, and says nothing about target elements outside the image.
+\begin{theorem}[Naturality preserves grounding on the image]\label{thm:preserve}
+If the structural squares commute and all three valuations are natural with respect to some $U^V$, then $\mathsf{PreservesGroundingOnImage}(U)$. In particular, if grounding holds at $t$ it holds at every transported seam element at $u$. (\coq{natural_valuations_preserve_grounding_on_image}, \coq{grounding_at_transported_elements})
+\end{theorem}
+Naturality also composes, with $U^V$ composing (\coq{natural_id}, \coq{natural_compose}). A $\mathsf{SeamEvolution}$ that preserves grounding on the image is a grounded-proper context (\coq{original_grounding_preserving_evolution_is_grounded_proper}); the hypothesis is exposed in the name because the witness map must send a grounded crossing at $r$ to a grounded crossing at its image.
+
+\subsection{Coverage}
+\begin{theorem}[Global preservation under coverage]\label{thm:coverage}
+If $U^\Sigma_{t,u}$ is surjective, grounding is preserved on its image, and grounding holds throughout the seam at $t$, then grounding holds throughout the seam at $u$. (\coq{surjective_evolution_preserves_all_grounding})
+\end{theorem}
+Without surjectivity, new target seam elements require new grounding evidence. We exhibit a model in which preservation on the image holds and every stage-$t$ element is grounded, yet a new stage-$u$ element outside the image is not (\coq{preservation_without_coverage}). This separates \emph{continuation} from \emph{coverage}, and fits the intended reading: a new process requires a new certificate.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=7mm and 12mm, box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small}, dia/.style={draw,diamond,aspect=2.2,align=center,inner sep=1pt,font=\small}, >=Stealth]
+\node[box] (S) {Structural naturality\\ (squares commute)};
+\node[box,right=of S] (V) {Valuation naturality\\ (all three, with $U^V$)};
+\node[box,below=of V] (G) {Grounding preserved\\ on the image};
+\node[dia,below=of G] (C) {Target\\ covered?};
+\node[box,below left=of C] (A) {Global target\\ grounding};
+\node[box,below right=of C] (N) {New certificate\\ required};
+\draw[->] (S) -- (G);
+\draw[->] (V) -- (G);
+\draw[->] (G) -- (C);
+\draw[->] (C) -- node[left,font=\scriptsize]{surjective / certified coverage} (A);
+\draw[->] (C) -- node[right,font=\scriptsize]{new elements} (N);
+\end{tikzpicture}
+\caption{Structural and valuational preservation. Structure alone does not give preservation of grounding; preservation alone does not give coverage.}
+\label{fig:dynamic}
+\end{figure}
+
+\subsection{Dynamic failure}
+\begin{theorem}[Extensional persistence without grounded preservation]\label{thm:dynfail}
+There is an evolution for which the structural squares commute; extensional agreement holds at both stages; grounding holds at $t$; and grounding fails at the transported element at $u$. Ordinary factor transport remains available at $u$. (\coq{dynamic_failure_visible}, \coq{ordinary_rewriting_still_succeeds}, \coq{structural_naturality_not_preservation})
+\end{theorem}
+The model has two stages and one seam element. The coordinates read true at both stages, so pairwise agreement persists. The seam valuation is true at the first stage and false at the second. No evolution preserves grounding, because the unique transported element loses it. This is the formal maintenance-debt example: warrant was valid at issuance, the system evolved, and the coordinates continue to agree while the independently evolved ground no longer does.
+
+\subsection{Interpretive consequence}
+Structural naturality preserves the relationship between carriers and projections. It does not, by itself, preserve the warrant attached to their valuations. A migration whose squares commute can be structurally faithful and evidentially stale.

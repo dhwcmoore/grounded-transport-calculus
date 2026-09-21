@@ -1,0 +1,25 @@
+--- tenant isolation ---
+|S| = 8
+phi on M1 = (code,c)                     fibres=  4 mixed= 2  Inadmissible; witness (a,a,direct) / (a,b,admin)
+phi on (code,c,path)                     fibres=  6 mixed= 2  Inadmissible; witness (a,a,admin) / (a,b,admin)
+phi on M2 = (code,c,o)                   fibres=  6 mixed= 0  Admissible; factor table 6 entries, verified
+phi on M1, c=o sample (incomplete)       fibres=  2 mixed= 0  NoWitnessFound
+kernel of <M1, phi>: 6 blocks
+--- pressure telemetry ---
+|S| = 64; phi holds on 27
+phi on raw window                        fibres= 64 mixed= 0  Admissible; factor table 64 entries, verified
+phi on M_sum                             fibres= 10 mixed= 4  Inadmissible; witness (0,0,3) / (0,1,2)
+phi on (sum,max)                         fibres= 16 mixed= 0  Admissible; factor table 16 entries, verified
+kernel of <M_sum, phi>: 14 blocks
+--- composition ---
+|S| = 24; phi1 holds on 18; phi2 holds on 20; phi3 holds on 16; psi fails on 4
+phi1 on M_G = (c,o,d)                    fibres=  8 mixed= 0  Admissible; factor table 8 entries, verified
+phi2 on M_T = (d,k)                      fibres=  6 mixed= 0  Admissible; factor table 6 entries, verified
+psi on M_G x M_T                         fibres= 24 mixed= 0  Admissible; factor table 24 entries, verified
+psi on C = <phi1,phi2>                   fibres=  3 mixed= 2  Inadmissible; witness (a,a,false,a) / (a,b,true,a)
+psi on C' = <phi1,phi2,phi3>             fibres=  6 mixed= 0  Admissible; factor table 6 entries, verified
+psi = not phi1 or phi3 on every state: true
+phi3 = psi on every state: false; states where phi3 fails and psi holds: 4
+psi on <phi1,phi2,owner-only token>      fibres=  4 mixed= 2  Inadmissible; witness (a,a,true,b) / (a,b,true,a)
+--- pre-check ---
+non-reflexive obs_equal: MalformedCertificate: obs_equal is not reflexive on the observed image

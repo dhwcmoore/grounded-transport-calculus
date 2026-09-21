@@ -1,0 +1,61 @@
+\section{Mechanisation and executable evidence}\label{sec:mechanisation}
+
+\subsection{Development structure}
+The development comprises roughly three thousand lines of theory and eight hundred of examples. Its layers are kept separate:
+\begin{enumerate}
+\item the \textbf{legacy layer}: an earlier supplement, imported byte-for-byte, checksum-verified, and built as an independent library;
+\item the \textbf{generic calculus}: the kernel structure, erasure, grounded-proper contexts, and obstructions;
+\item the \textbf{compatibility layer}: proofs that the legacy seam, evolution and admissibility definitions instantiate the generic ones;
+\item the \textbf{assessment layer}: certificates, witnesses, located obstructions, assessments, the lineage checker, packed warrants;
+\item \textbf{examples}: the separating models of \cref{sec:evaluation}.
+\end{enumerate}
+The generic calculus is not replaced by the legacy material; each is preserved, and the compatibility layer proves that the original definitions instantiate the generic ones.
+
+\subsection{Trust boundary}
+\begin{table}[t]
+\centering\small
+\caption{Trust boundary and non-claims.}\label{tab:trust}
+\begin{tabularx}{\textwidth}{@{}lY@{}}
+\toprule
+Checked mechanically & Coq 8.18.0; build with \texttt{coq\_makefile} and \texttt{dune}; \texttt{coqchk} on the whole project except the isolated classical file; \texttt{Print Assumptions} for every reported theorem; checksum verification of the legacy supplement. \\
+Trusted & The Coq kernel and extraction mechanism; the encoding of $\nat$ as OCaml integers in extracted code; the declared records themselves. \\
+Not established & Completeness of declared lineage; accuracy of raw inputs; adequacy of the state model; legitimacy or competence of an authority; decidability of general obligations; equivalence of the handwritten OCaml audit with the checked one. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Classical factorisation}
+The unrestricted functional converse of fibre factorisation needs classical choice and is isolated in one file that nothing else imports; the rest of the development is axiom-free. The constructive alternatives are the relational formulation and the finite theorem with a complete enumeration and decidable equality. The main development does not depend on the classical file: \texttt{coqchk} succeeds on the project without it and reports no axioms.
+
+\subsection{Extraction behaviour}
+Certificate data live in \texttt{Type}; their proofs live beside them. Extraction removes the proof fields and keeps the data.
+
+\begin{table}[t]
+\centering\small
+\caption{Evidence fields and whether they survive extraction.}\label{tab:survive}
+\begin{tabularx}{\textwidth}{@{}lYc@{}}
+\toprule
+Component & Field & Survives \\
+\midrule
+Exhibition certificate & record id, identifiers, process, retained record and evaluator, coverage, custodian & yes \\
+ & injectivity of identifiers; valuation factorisation proof & no \\
+Lineage certificate & graph, coverage record with gaps, issued verdict & yes \\
+ & well-formedness, L1--L3 proofs & no \\
+Construction certificate & seam inhabitant & yes \\
+ & grounding equations & no \\
+Obstruction & constructor tag; located data (seam element, node id) & yes \\
+ & Prop-valued evidence & no \\
+Assessment & verdict, open reasons, gaps & yes \\
+Maintenance / authority & application-supplied data, via the summary interface & if in \texttt{Type} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+We extracted the assessments of the examples to OCaml and wrote a consumer. For a certified assessment it reports the custodian (7), record id (1), lineage ground node (5) and audit verdict (\texttt{LineagePass}). For the copied model it reports a refutation at construction whose constructor names a lineage descent; for the maintenance model, a maintenance obstruction; for the model with both, both, in order. This is the concrete content of the claim that the formal distinction survives compilation. It is materially stronger than attaching abstract propositions \texttt{Exhibited} and \texttt{LineageGrounded} to an ordinary relation, whose proofs would be erased.
+
+\subsection{Evidence summaries}
+Maintenance and authority evidence stay abstract in the generic library: the calculus should not impose one institutional record format. What it provides is a \emph{summary interface},
+\begin{lstlisting}
+Class EvidenceSummary (A : Type) := { evidence_summary : A -> list EvidenceAtom }.
+\end{lstlisting}
+with atoms for records, custodians, ground nodes, intervals, authorities, maintenance events, expiry and revalidation. Applications supply instances, so an extracted consumer can inspect more than the exhibition and lineage components without the kernel fixing a schema. This is an observability extension, not a kernel correctness gap; the witness summary now includes maintenance and authority atoms.

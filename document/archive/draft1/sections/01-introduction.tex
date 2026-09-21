@@ -1,0 +1,36 @@
+\section{Introduction}\label{sec:intro}
+
+\subsection{The limitation of extensional rewriting}
+Ordinary rewriting licenses substitution under a relation. If $x \mathrel{R} y$ and $C$ is a context that respects the relevant relations, then $C[x] \mathrel{R'} C[y]$. This is deliberately extensional: once $x \mathrel{R} y$ has been established, the rewriting step normally does not retain how $x$ and $y$ were connected, which process produced the claimed agreement, whether one side was copied from the other, whether the evidence was independently grounded, whether the transformation has been maintained through time, or whether any obligation remains open.
+
+For mathematical equality this forgetting is harmless, and it is the source of rewriting's power. For audited migrations, provenance-sensitive predicates, certified transformations and socio-technical assurance it is not always harmless. There, whether a substitution is \emph{warranted} can depend on exactly the information that a relational proof discards.
+
+\subsection{The motivating phenomenon}
+Consider a dual-write migration in which two services record a status for each request, and a third source, an execution trace, records what actually happened. On an ordinary request all three agree. On one exceptional request both services report success---because one copied the other---while the trace records failure. The two service records agree with each other, so ordinary relational rewriting between them succeeds; they disagree with the independently exhibited process. If we repair the disagreement by defining the trace valuation to be the first service's value, all equations hold, but the ``ground'' now descends from the coordinate it was supposed to ground. The endpoint equation is true; its evidential warrant has failed.
+\Cref{sec:example} works this example out completely; it is the separating model for most of the paper.
+
+\subsection{The proposed solution}
+We introduce \emph{grounded transport}, written schematically $\GTrans_c(x,y) : \Type$ for a declared transport problem $c$. An inhabitant is not merely a proof that $x$ and $y$ are related: it carries the evidence by which transport is licensed. Erasure recovers ordinary substitutability in two stages,
+\[
+\GTrans_c(x,y) \;\xrightarrow{\ \erase_1\ }\; \Cross_c(x,y) \;\xrightarrow{\ \erase_2\ }\; R(x,y),
+\]
+first forgetting certificates while keeping the directed crossing, then forgetting the crossing while keeping the relation. The central asymmetry is
+\[
+\GTrans_c(x,y) \Longrightarrow R(x,y), \qquad\text{but in general}\qquad R(x,y) \centernot\Longrightarrow \GTrans_c(x,y).
+\]
+Ordinary rewriting is therefore the extensional image of the calculus, not something the calculus abandons.
+
+\subsection{Contributions}
+\begin{enumerate}
+\item \textbf{A grounded transport calculus} (\cref{sec:calculus}). A directed, proof-relevant transport judgement carrying extractable seam, exhibition, lineage, coverage and record evidence, with identity and composition, and with the algebraic laws stated modulo an explicit witness equivalence.
+\item \textbf{Erasure theory} (\cref{sec:erasure}). A two-stage erasure, its soundness, the induced preorder, a precise distinction between sound refinement and exact recovery, a proof that erasure does not reflect grounding, and a proof that distinct warrants can erase to the same judgement.
+\item \textbf{Contextual preservation} (\cref{sec:contexts}). A $\GProper$ interface for contexts that transport witnesses compositionally, inducing ordinary $\Proper$ instances after erasure.
+\item \textbf{Seam and temporal instances} (\cref{sec:seams,sec:dynamic}). A compatibility result recovering an earlier grounded-seam theorem, and a separation of structural naturality, valuation naturality, preservation of grounding, and coverage.
+\item \textbf{Obstruction theory} (\cref{sec:obstruction}). Located evidence showing why extensional or observational agreement can fail to warrant lineage-sensitive substitution.
+\item \textbf{Evidence-bearing assessment} (\cref{sec:assessment,sec:lineage}). A problem-indexed, three-valued semantics (certified, refuted, open) that retains every located failure, distinguishes missing evidence from counterevidence, and includes a lineage audit proved to reflect its specification.
+\item \textbf{Mechanised validation} (\cref{sec:mechanisation}). A Coq development, axiom-free in its kernel and checked with \texttt{coqchk}, with extracted OCaml programs showing that evidential data survive proof erasure.
+\end{enumerate}
+We do not claim that equality, setoid rewriting, factorisation, or proof-relevant relations are new. The contribution is their integration into one calculus with the properties above.
+
+\subsection{Scope and non-claims}
+The calculus does \emph{not} prove that a declared lineage graph is complete; that raw evidence is accurate; that a state model adequately represents a concrete process; that an institutional authority is legitimate or competent; that every transport obligation is decidable; or that ordinary rewriting is unsound. The claim is narrower: ordinary rewriting is \emph{evidentially incomplete} for some applications, and this incompleteness can be repaired without giving up its extensional image. The calculus makes explicit what is declared; it does not make declarations true.

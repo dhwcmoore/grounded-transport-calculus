@@ -1,0 +1,104 @@
+\section{Dynamic preservation and failure}\label{sec:dynamic}
+
+\Cref{sec:seams} concerns one stage. This section asks what survives when the system evolves, and separates four notions that are easily conflated: structural naturality, valuation naturality, preservation of grounding, and coverage.
+
+\subsection{Structural naturality}
+A \emph{seam evolution} $U$ from stage $t$ to stage $u$ consists of maps $U^\Sigma : \Sigma_t \to \Sigma_u$, $U^A : A_t \to A_u$, $U^B : B_t \to B_u$ such that the squares commute:
+\[
+\back_u \circ U^\Sigma = U^A \circ \back_t, \qquad \fwd_u \circ U^\Sigma = U^B \circ \fwd_t.
+\]
+Evolutions have identity and composition (componentwise), and commutation composes: the composite of two evolutions commutes. Its state map $\mathsf{inl}\,a \mapsto \mathsf{inl}(U^A a)$, $\mathsf{inr}\,b \mapsto \mathsf{inr}(U^B b)$ agrees pointwise with the composite of the state maps of the steps, so the composite evolution and $\mathsf{gp\_comp}$ of the steps act identically (\coq{evo_state_id}, \coq{evo_state_compose}, \coq{evolution_compose_via_gp_comp}). The squares say nothing about valuations.
+
+\subsection{Valuational preservation}\label{sec:valuational}
+If the value spaces carry a transport $U^V : \bool \to \bool$, one may additionally require \emph{valuation naturality}, of all three valuations:
+\[
+\Phi_{A,u} \circ U^A = U^V \circ \Phi_{A,t}, \quad
+\Phi_{B,u} \circ U^B = U^V \circ \Phi_{B,t}, \quad
+\Phi_{\Sigma,u} \circ U^\Sigma = U^V \circ \Phi_{\Sigma,t}.
+\]
+Values need not stay unchanged: requiring $U^V = \mathrm{id}$ would turn a dynamic predicate into a temporal invariant. Write $\mathsf{GE}_t(r)$ for the grounding equations at $r \in \Sigma_t$ and define
+\[
+\mathsf{PreservesGroundingOnImage}(U) \;:\Longleftrightarrow\; \forall r \in \Sigma_t.\ \mathsf{GE}_t(r) \Rightarrow \mathsf{GE}_u(U^\Sigma(r)).
+\]
+This property concerns only seam elements \emph{of the form} $U^\Sigma(r)$, and says nothing about target elements outside the image. (In the development it is called \coq{PreservesGroundingOnImage}.)
+
+\begin{thm}[Naturality preserves grounding on the image]\label{thm:preserve}
+If the structural squares commute and all three valuations are natural with respect to some $U^V$, then $\mathsf{PreservesGroundingOnImage}(U)$. In particular if $\mathsf{GE}$ holds at every element of $\Sigma_t$ then $\mathsf{GE}_u$ holds at every transported element. \emph{(Coq: \coq{natural_valuations_preserve_grounding_on_image}, \coq{grounding_at_transported_elements}.)}
+\end{thm}
+\begin{proof}
+Let $\mathsf{GE}_t(r)$ hold. Then
+\begin{align*}
+\Phi_{A,u}(\back_u(U^\Sigma r)) &= \Phi_{A,u}(U^A(\back_t r)) && \text{(back square)}\\
+&= U^V(\Phi_{A,t}(\back_t r)) && \text{(naturality of $\Phi_A$)}\\
+&= U^V(\Phi_{\Sigma,t}(r)) && \text{($\mathsf{GE}_t(r)$)}\\
+&= \Phi_{\Sigma,u}(U^\Sigma r) && \text{(naturality of $\Phi_\Sigma$)},
+\end{align*}
+and symmetrically for $B$ with the fwd square.
+\end{proof}
+Naturality is preserved by identity and composition, with $U^V$ composing (\coq{natural_id}, \coq{natural_compose}).
+
+\begin{thm}[Global preservation under coverage]\label{thm:coverage}
+If $U^\Sigma$ is surjective, $U$ preserves grounding on the image, and $\mathsf{GE}_t(r)$ holds for all $r \in \Sigma_t$, then $\mathsf{GE}_u(r')$ holds for all $r' \in \Sigma_u$. \emph{(Coq: \coq{surjective_evolution_preserves_all_grounding}.)}
+\end{thm}
+\begin{proof}
+Let $r' \in \Sigma_u$. By surjectivity $r' = U^\Sigma(r)$ for some $r$; apply preservation to $\mathsf{GE}_t(r)$.
+\end{proof}
+Without surjectivity, new target elements require new grounding evidence: there is a model in which preservation on the image holds and every stage-$t$ element is grounded, yet a stage-$u$ element outside the image is not (\coq{preservation_without_coverage}). Preservation of grounding therefore separates \emph{continuation} from \emph{coverage}, and matches the reading that a new process requires a new certificate (\cref{fig:dynamic}).
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=7mm and 12mm, box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small}, dia/.style={draw,diamond,aspect=2.2,align=center,inner sep=1pt,font=\small}, >=Stealth]
+\node[box] (S) {Structural naturality\\ (squares commute)};
+\node[box,right=of S] (V) {Valuation naturality\\ (all three, with $U^V$)};
+\node[box,below=of V] (G) {Grounding preserved\\ on the image};
+\node[dia,below=of G] (C) {Target\\ covered?};
+\node[box,below left=of C] (A) {Global target\\ grounding};
+\node[box,below right=of C] (N) {New certificate\\ required};
+\draw[->] (S) -- (G);
+\draw[->] (V) -- (G);
+\draw[->] (G) -- (C);
+\draw[->] (C) -- node[left,font=\scriptsize]{surjective / certified coverage} (A);
+\draw[->] (C) -- node[right,font=\scriptsize]{new elements} (N);
+\end{tikzpicture}
+\caption{Structural and valuational preservation. Structure alone does not give preservation of grounding; preservation alone does not give coverage.}
+\label{fig:dynamic}
+\end{figure}
+
+\subsection{Evolutions as contexts, at both levels}
+A seam evolution $U$ that preserves grounding on the image is a \emph{crossing-proper} context between the crossing structures at the two stages (\coq{evolution_crossing_proper}, built on \coq{original_grounding_preserving_evolution_is_grounded_proper}), acting on states by $\mathsf{inl}\,a \mapsto \mathsf{inl}(U^A a)$, $\mathsf{inr}\,b \mapsto \mathsf{inr}(U^B b)$ and on crossed seam elements by $U^\Sigma$. On a crossing at $r$ it produces the crossing at $U^\Sigma(r)$, its grounding equations supplied by preservation, with endpoints transported along the two squares. Identity and composition of witnesses are respected, so \cref{thm:twolevels} applies and composite evolutions are crossing-proper (\coq{evolution_compose_grounded_proper}). The hypothesis is exposed in the name because the witness map must send a grounded crossing at $r$ to a grounded crossing at its image.
+
+Crossing-proper preservation carries no certificates. For an evolution to be \emph{certificate-proper} it must come with an evidence lift (\cref{def:pm}): a way to turn certified transports at stage $t$ into certified transports at stage $u$. Two models with the same structure show that this is a genuine additional requirement.
+\begin{thm}[Certificate reissue, and its impossibility]\label{thm:reissue}
+Consider the two-stage model of \cref{thm:dynfail} with the problems $c_0$ and $c_1$ at stages $0$ and $1$ (trivial maintenance, authority and observation evidence, and the independent lineage record of \cref{sec:multiplicity}).
+(a) If the seam valuation is $1$ at both stages, there is a problem morphism $c_0 \to c_1$ whose lift \emph{reissues} a certificate at stage $1$; hence its state map is certificate-proper.
+(b) If, as in \cref{thm:dynfail}, $\Phi_{\Sigma,1}(\ast) = 0$ while $\Phi_{\Sigma,0}(\ast) = 1$, there is \emph{no} problem morphism $c_0 \to c_1$.
+\emph{(Coq: \coq{reissue_certificate_proper}, \coq{no_evidence_lift_when_grounding_lost}.)}
+\end{thm}
+\begin{proof}
+(a) All components are the unique maps into or out of $\{\ast\}$, so the squares commute and grounding is preserved (both sides are $1 = 1$). For the lift, note that a certified transport for $c_1$ exists: the exhibition certificate uses $\mathrm{Ret} = \bool$ with $\mathsf{retain} = \Phi_{\Sigma,1}$ and $\mathsf{eval} = \mathrm{id}$, the lineage certificate is that of the independent record, and the grounding equations at stage $1$ read $1 = 1$. Let the lift send every certified transport of $c_0$ to this one. \cref{thm:lifting} makes the state map certificate-proper.
+(b) A certified transport for $c_0$ exists: the same construction at stage $0$, where the equations read $1 = 1$. Any evidence lift would send it to a certified transport for $c_1$, whose construction certificate contains the grounding equation $\Phi_{A,1}(\back\ast) = \Phi_{\Sigma,1}(\ast)$, that is $1 = 0$, a contradiction.
+\end{proof}
+So preservation of \emph{complete certificates} fails exactly where maintenance of grounding fails. In (b) the evolution does not preserve grounding on the image (\cref{thm:dynfail}), so the crossing-level instance above is unavailable as well; and where the crossing-level instance exists, as in (a), the certificate-level instance still needs an evidence lift, which we supply only by reissuing. A general theory of maintaining exhibition records and lineage across evolutions, rather than reissuing them, is left open (\cref{sec:limitations}).
+
+\subsection{The dynamic separation theorem}
+\begin{thm}[Extensional persistence without grounded preservation]\label{thm:dynfail}
+There is a seam evolution such that
+(1) the structural squares commute;
+(2) extensional agreement holds at both stages;
+(3) ordinary factor transport remains valid at the later stage;
+(4) grounding holds at the earlier stage;
+(5) grounding fails at a transported seam element.
+\emph{(Coq: \coq{dynamic_failure_visible}, \coq{ordinary_rewriting_still_succeeds}, \coq{structural_naturality_not_preservation}.)}
+\end{thm}
+\begin{proof}
+Take two stages $0,1$ and $\Sigma_t = A_t = B_t = \{\ast\}$ at each, with all projections the unique map. Let $\Phi_{A,t} = \Phi_{B,t} \equiv 1$ at both stages, $\Phi_{\Sigma,0}(\ast) = 1$ and $\Phi_{\Sigma,1}(\ast) = 0$. Let $U$ be the unique evolution (all components the unique maps).
+(1) All maps into $\{\ast\}$ are equal, so both squares commute.
+(2) At each stage $\Phi_A(\back(\ast)) = 1 = \Phi_B(\fwd(\ast))$.
+(3) With $M_A$ constant and $h \equiv 1$ we have $\Phi_A = h \circ M_A$, and $\Phi_B(\fwd(\ast)) = 1 = h(M_A(\back(\ast)))$ at stage $1$; this is \cref{prop:extfactor} at stage $1$.
+(4) At stage $0$: $\Phi_{A,0}(\back \ast) = 1 = \Phi_{\Sigma,0}(\ast)$ and likewise for $B$.
+(5) The unique transported element is $U^\Sigma(\ast) = \ast \in \Sigma_1$, and $\Phi_{A,1}(\back \ast) = 1 \neq 0 = \Phi_{\Sigma,1}(\ast)$, so $\mathsf{GE}_1(\ast)$ fails.
+\end{proof}
+Consequently $\mathsf{PreservesGroundingOnImage}(U)$ fails, although every squares-commute and agreement condition holds. This is the formal maintenance result: the warrant was valid at issuance, the system evolved, and the coordinates continue to agree while the independently evolved ground no longer agrees with them.
+
+\subsection{Interpretation}
+Structural naturality preserves the relationship between carriers and coordinates. It does not automatically preserve the relationship between those coordinates and their independently grounded valuation, nor the certificates attesting to it. Maintenance evidence is therefore distinct from extensional preservation: a migration whose squares commute can be structurally faithful and evidentially stale. We call the located counterexample to such preservation a \emph{maintenance obstruction} (\cref{sec:assessment}).

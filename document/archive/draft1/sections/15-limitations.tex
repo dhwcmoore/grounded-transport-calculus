@@ -1,0 +1,37 @@
+\section{Limitations}\label{sec:limitations}
+
+\paragraph{Declared-graph limitation.}
+A lineage certificate proves properties of the \emph{declared} graph. It does not prove that the graph contains every real production path, and the audit cannot detect a production path the record omits.
+
+\paragraph{Raw-input limitation.}
+The calculus can identify claim-relevant raw inputs without proving that they accurately record the concrete process.
+
+\paragraph{Institutional limitation.}
+Authority and custodianship can be represented as data, but their legitimacy and competence are not established internally; the rule system is an input. Exhibition conditions concerning the declared process, coverage and custodian are recorded, not verified.
+
+\paragraph{Decidability limitation.}
+General transport obligations need not be decidable. The open assessment is essential, not an implementation inconvenience.
+
+\paragraph{Coverage limitation.}
+Preservation on the image of an evolution does not certify new target states outside that image (\cref{thm:coverage}).
+
+\paragraph{The endpoint theorem is extensional.}
+The equality concluded by seam transport needs only extensional agreement. Grounding strengthens its warrant, not its algebraic conclusion (\cref{sec:seams}).
+
+\paragraph{Composition in the concrete instance.}
+In a single seam a non-identity witness is one crossing, so composition of non-trivial witnesses is degenerate there; its content appears through contexts and evolution.
+
+\paragraph{Witness algebra modulo an equivalence.}
+Identity and associativity hold up to the crossing-sequence equivalence, not by literal equality (\cref{sec:laws}).
+
+\paragraph{The audit boundary.}
+The Coq checker is proved to reflect its specification; the handwritten OCaml audit is tested against it, not proved equivalent (\cref{sec:lineage,sec:evaluation}). The decision core of the supplement has not yet been replaced by the extracted checker. Assessment components for maintenance and authority are abstract in the generic library.
+
+\paragraph{Boolean valuations.}
+Valuations are Boolean; a general value space with a value transport is used only in the statement of valuation naturality.
+
+\paragraph{No automated tactic yet.}
+The contribution is semantic and mechanised, not a packaged rewriting tactic.
+
+\paragraph{No empirical claim.}
+The examples demonstrate logical separations, not usability or scalability on production systems.

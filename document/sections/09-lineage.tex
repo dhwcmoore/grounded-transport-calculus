@@ -1,0 +1,110 @@
+\section{Certified lineage checking}\label{sec:lineage}
+
+Lineage certificates (\cref{def:certs}) require a decision about a declared graph. This section defines that decision as a function, proves it correct, and shows that acceptance constructs a certificate.
+
+\subsection{Finite lineage data}
+\begin{defi}[Lineage record]\label{def:lineage}
+A \emph{lineage record} $g$ is finite data: a list $D$ of pairs $(n,\mathit{ps})$ (a derived field and its parents); a list $\mathit{Raw}$ of raw inputs; a list $\mathit{Rel}$ of claim-relevant inputs; three distinguished nodes $d_A$, $d_B$ and $\gamma$ (the determinations $\Phi_A\circ\back$, $\Phi_B\circ\fwd$ and $\Phi_\Sigma$); and a list $\Delta$ of pairs $(n,\delta)$ giving a disposition (justified, or open defeater) to a shared ancestor. Nodes are natural numbers. Write $\mathsf{nodes}(g) = \mathsf{dom}(D) \mathbin{+\!\!+} \mathit{Raw}$, $N = |\mathsf{nodes}(g)|$, and $\mathsf{parents}_g(n)$ for the parents in the first entry of $D$ with key $n$ ($[\,]$ if none). A \emph{coverage record} is $\varkappa = (\mathsf{from},\mathsf{to},\mathsf{gaps})$ with $\mathsf{gaps}$ a list of unrecorded segments.
+\end{defi}
+$\mathrm{Anc}_g(n,m)$ (``$m$ is a strict ancestor of $n$'') is the least relation with $\mathrm{Anc}_g(n,m)$ whenever $m \in \mathsf{parents}_g(n)$, and $\mathrm{Anc}_g(n,m)$ whenever $p \in \mathsf{parents}_g(n)$ and $\mathrm{Anc}_g(p,m)$.
+
+\begin{defi}[Lineage conditions]\label{def:L}
+$\mathsf{WF}(g)$ holds iff: (1) $\mathsf{nodes}(g)$ is duplicate-free; (2) every parent of every entry is in $\mathsf{nodes}(g)$; (3) $d_A,d_B,\gamma \in \mathsf{dom}(D)$; (4) $\mathit{Rel} \subseteq \mathit{Raw}$; (5) $\neg\mathrm{Anc}_g(n,n)$ for all $n$. Further:
+\begin{description}
+\item[L1] (no descent) $\neg\mathrm{Anc}_g(\gamma,d_A)$ and $\neg\mathrm{Anc}_g(\gamma,d_B)$;
+\item[L2] (disclosure) every $n$ with $\mathrm{Anc}_g(d_A,n)$, $\mathrm{Anc}_g(d_B,n)$ and $n \notin \mathit{Raw}$ lies in $\mathsf{dom}(\Delta)$;
+\item[L3] (independent source) some $n \in \mathit{Raw} \cap \mathit{Rel}$ has $\mathrm{Anc}_g(\gamma,n)$, $\neg\mathrm{Anc}_g(d_A,n)$, $\neg\mathrm{Anc}_g(d_B,n)$, $n \neq d_A$, $n \neq d_B$.
+\end{description}
+$\mathsf{LineagePasses}(g) :\equiv \mathsf{WF}(g) \wedge \mathrm{L1} \wedge \mathrm{L2} \wedge \mathrm{L3}$.
+\end{defi}
+A passing verdict applies only to the declared graph \emph{and} its declared coverage: a partial record must not be reported as globally lineage-grounded. In the running example the ground $\gamma$ of the copied graph descends from $d_A$, so it violates L1.
+
+\subsection{Ancestor saturation}
+Ancestors are computed by saturation. Let $\mathsf{close}(S) = \mathsf{dedup}\bigl(S \mathbin{+\!\!+} \bigcup_{p \in S} \mathsf{parents}_g(p)\bigr)$ and, for a node $n$,
+\[
+S_0 = \mathsf{dedup}(\mathsf{parents}_g(n)), \qquad S_{k+1} = \mathsf{close}(S_k), \qquad \mathsf{anc}_g(n) = S_N .
+\]
+\begin{thm}[Ancestor correctness]\label{thm:anc}
+(a) For every $g$: $m \in \mathsf{anc}_g(n) \Rightarrow \mathrm{Anc}_g(n,m)$.
+(b) If every parent is declared ($\mathsf{(P)}$: $q \in \mathsf{parents}_g(p) \Rightarrow q \in \mathsf{nodes}(g)$), then $\mathrm{Anc}_g(n,m) \Rightarrow m \in \mathsf{anc}_g(n)$.
+Hence under $(\mathsf{P})$, $m \in \mathsf{anc}_g(n) \Leftrightarrow \mathrm{Anc}_g(n,m)$. \emph{(Coq: \coq{ancestors_sound}, \coq{ancestors_complete}, \coq{ancestors_iff}.)}
+\end{thm}
+\begin{proof}
+\emph{(a)} By induction on $k$, every element of $S_k$ is an ancestor of $n$. For $S_0$ this is the base clause of $\mathrm{Anc}$. If $m \in S_{k+1}$ then either $m \in S_k$, or $m \in \mathsf{parents}_g(p)$ for some $p \in S_k$; by hypothesis $\mathrm{Anc}_g(n,p)$, and appending a parent to an ancestor chain gives $\mathrm{Anc}_g(n,m)$.
+
+\emph{(b)} Assume $(\mathsf{P})$ and fix $n$. We show that $S_N$ contains $n$'s parents and is closed under parents, and then that it contains every ancestor. Write $|S|$ for the length of a duplicate-free list.
+\begin{enumerate}
+\item[(i)] \emph{Monotone, duplicate-free, bounded.} $S_k \subseteq S_{k+1}$ (as $\mathsf{close}$ keeps $S_k$), each $S_k$ is duplicate-free (it is $\mathsf{dedup}$ of something), and $S_k \subseteq \mathsf{nodes}(g)$ by $(\mathsf{P})$ and induction on $k$. Hence $|S_k| \le N$ for all $k$.
+\item[(ii)] \emph{Stabilisation propagates.} If $S_{k+1} \subseteq S_k$ then $S_{k+j} \subseteq S_k$ for all $j$. By induction on $j$: if $S_{k+j} \subseteq S_k$ then every parent of a member of $S_{k+j}$ is a parent of a member of $S_k$, hence lies in $S_{k+1} \subseteq S_k$; so $S_{k+j+1} = \mathsf{close}(S_{k+j}) \subseteq S_k$.
+\item[(iii)] \emph{Non-stabilisation forces growth.} If $S_{i+1} \not\subseteq S_i$ for every $i < j$, then $|S_j| \ge j$. Each such step adds an element $x \notin S_i$ while keeping $S_i$; as $S_i$ is duplicate-free, $x :: S_i$ is duplicate-free and contained in $S_{i+1}$, so $|S_{i+1}| \ge |S_i| + 1$.
+\item[(iv)] \emph{Stabilisation occurs by round $N$.} If $S_{i+1} \not\subseteq S_i$ for all $i \le N$, then (iii) with $j = N+1$ gives $|S_{N+1}| \ge N+1$, contradicting (i). So some $i \le N$ has $S_{i+1} \subseteq S_i$.
+\item[(v)] \emph{$S_N$ is closed under parents.} With $i$ from (iv), (ii) gives $S_{N+1} \subseteq S_i \subseteq S_N$ (using monotonicity for $i \le N$). If $p \in S_N$ then $\mathsf{parents}_g(p) \subseteq S_{N+1} \subseteq S_N$.
+\item[(vi)] \emph{Every ancestor is found.} We prove by induction on the derivation of $\mathrm{Anc}_g(a,m)$ that $(a = n \lor a \in S_N) \Rightarrow m \in S_N$. If $m \in \mathsf{parents}_g(a)$: for $a = n$, $m \in S_0 \subseteq S_N$; for $a \in S_N$ use (v). If $p \in \mathsf{parents}_g(a)$ and $\mathrm{Anc}_g(p,m)$: as before $p \in S_N$, and the induction hypothesis at $p$ gives $m \in S_N$. Taking $a = n$ gives the claim.\qedhere
+\end{enumerate}
+\end{proof}
+The pigeonhole content is (iii)--(iv): a saturation that kept discovering new nodes after $N+1$ rounds would hold $N+1$ distinct declared nodes, more than the graph contains. The bound $N$ is used in the definition of $\mathsf{anc}_g$; only $(\mathsf{P})$ is needed, not acyclicity, which is itself checked below.
+
+\subsection{Reflected conditions}
+Define the Boolean checks: $\mathsf{wf}_1,\dots,\mathsf{wf}_4$ (clauses (1)--(4) of $\mathsf{WF}$, by list computation), $\mathsf{cycle}(g) = $ the first $n \in \mathsf{nodes}(g)$ with $n \in \mathsf{anc}_g(n)$; $\mathsf{c}_1$: $d_A,d_B \notin \mathsf{anc}_g(\gamma)$; $\mathsf{c}_2$: every $n \in \mathsf{anc}_g(d_A)$ with $n \in \mathsf{anc}_g(d_B)$ and $n \notin \mathit{Raw}$ is in $\mathsf{dom}(\Delta)$; $\mathsf{c}_3$: some $n \in \mathsf{anc}_g(\gamma)$ has $n \in \mathit{Raw} \cap \mathit{Rel}$, $n \notin \mathsf{anc}_g(d_A) \cup \mathsf{anc}_g(d_B)$, $n \neq d_A, d_B$.
+\begin{lem}[Reflection of the conditions]\label{lem:reflect}
+Each $\mathsf{wf}_i$ reflects clause $(i)$ of $\mathsf{WF}$, $i \le 4$. Under $(\mathsf{P})$, $\mathsf{c}_1 \Leftrightarrow \mathrm{L1}$, $\mathsf{c}_2 \Leftrightarrow \mathrm{L2}$ and $\mathsf{c}_3 \Leftrightarrow \mathrm{L3}$. \emph{(Coq: \coq{wf_defect_none_iff}, \coq{check_L1_reflect}, \coq{undisclosed_none_iff}, \coq{check_L3_reflect}.)}
+\end{lem}
+\begin{proof}
+The first four are direct list facts (membership and duplicate-freedom are decided by traversal). For the rest, replace $\mathsf{anc}_g$ by $\mathrm{Anc}_g$ using \cref{thm:anc} (both directions, under $(\mathsf{P})$); each check then states its condition verbatim.
+\end{proof}
+
+\subsection{Unconditional reflection}
+The audit returns the first defect found, in the order: well-formedness (duplicate, undeclared parent, distinguished node not derived, relevant input not raw, cycle), then L1 (descent from $d_A$, then from $d_B$), L2 (undisclosed shared ancestor), L3 (no independent source). Let $\mathsf{defect}(g) \in \mathsf{Option}(\text{Defect})$ be this result. Then
+\[
+\mathsf{lineageCheck}(g,\varkappa) \;=\;
+\begin{cases}
+\mathsf{Rejected}(d) & \text{if } \mathsf{defect}(g) = \mathsf{Some}(d),\\
+\mathsf{Accepted} & \text{if } \mathsf{defect}(g) = \mathsf{None} \text{ and } \mathsf{gaps}(\varkappa) = [\,],\\
+\mathsf{Open}(\mathsf{gaps}(\varkappa)) & \text{if } \mathsf{defect}(g) = \mathsf{None} \text{ and } \mathsf{gaps}(\varkappa) \neq [\,].
+\end{cases}
+\]
+\begin{lem}\label{lem:defectnone}
+$\mathsf{defect}(g) = \mathsf{None} \Longleftrightarrow \mathsf{LineagePasses}(g)$. \emph{(Coq: \coq{lineage_defect_none_iff}.)}
+\end{lem}
+\begin{proof}
+($\Leftarrow$) Assume $\mathsf{LineagePasses}(g)$. By \cref{lem:reflect}, $\mathsf{wf}_1,\dots,\mathsf{wf}_4$ pass. If $\mathsf{cycle}(g) = \mathsf{Some}(n)$ then $n \in \mathsf{anc}_g(n)$, so $\mathrm{Anc}_g(n,n)$ by \cref{thm:anc}(a), contradicting clause (5). So no well-formedness defect is reported. Clause (2) is $(\mathsf{P})$, so by \cref{lem:reflect} the checks $\mathsf{c}_1,\mathsf{c}_2,\mathsf{c}_3$ pass, and no defect is reported at all.
+($\Rightarrow$) Assume no defect. Then $\mathsf{wf}_1,\dots,\mathsf{wf}_4$ pass, giving clauses (1)--(4), in particular $(\mathsf{P})$. For clause (5) suppose $\mathrm{Anc}_g(n,n)$. Then $n$ has a parent, so $n$ is a key of $D$ and $n \in \mathsf{nodes}(g)$; by \cref{thm:anc}(b) $n \in \mathsf{anc}_g(n)$, so $\mathsf{cycle}(g)$ would report a cycle, a contradiction. So $\mathsf{WF}(g)$ holds. Now $(\mathsf{P})$ and passing $\mathsf{c}_1,\mathsf{c}_2,\mathsf{c}_3$ give L1, L2, L3 by \cref{lem:reflect}.
+\end{proof}
+\begin{thm}[Lineage-check reflection]\label{thm:reflect}
+Unconditionally,
+\[
+\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Accepted} \;\Longleftrightarrow\; \mathsf{LineagePasses}(g) \wedge \mathsf{gaps}(\varkappa) = [\,].
+\]
+\emph{(Coq: \coq{lineage_check_reflect}.)}
+\end{thm}
+\begin{proof}
+$\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Accepted}$ iff $\mathsf{defect}(g) = \mathsf{None}$ and $\mathsf{gaps}(\varkappa) = [\,]$; apply \cref{lem:defectnone}.
+\end{proof}
+The theorem needs no well-formedness hypothesis, unlike the conditional form one might first expect, because well-formedness is itself checked and reflected; soundness and completeness of ancestors (\cref{thm:anc}) are what make the acyclicity clause reflect.
+
+\subsection{Rejected and open outcomes}
+\begin{prop}[Rejection evidence]\label{prop:rejection}
+If $\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Rejected}(d)$ then the specification is violated in the way $d$ says, and $\neg\,\mathsf{LineagePasses}(g)$: a duplicate node, an undeclared parent, a distinguished node that is not derived, or a non-raw relevant input violates the corresponding clause of $\mathsf{WF}$; $\mathsf{Cycle}(n)$ gives $\mathrm{Anc}_g(n,n)$; $\mathsf{DescentFromA}$ (resp.\ $B$) gives $\mathrm{Anc}_g(\gamma,d_A)$ (resp.\ $d_B$); $\mathsf{UndisclosedShared}(n)$ gives $\mathrm{Anc}_g(d_A,n) \wedge \mathrm{Anc}_g(d_B,n) \wedge n \notin \mathit{Raw} \wedge n \notin \mathsf{dom}(\Delta)$; $\mathsf{NoIndependentSource}$ gives $\neg\mathrm{L3}$. \emph{(Coq: \coq{defect_sound}, \coq{lineage_check_rejected}.)}
+\end{prop}
+\begin{proof}
+Each defect is produced by exactly one failed check in a fixed order; \cref{lem:reflect} and \cref{thm:anc} convert the failed check into the stated fact. For $\mathsf{Cycle}(n)$: $n \in \mathsf{anc}_g(n)$ and \cref{thm:anc}(a). For descent and undisclosed ancestors, the same, since these are reported only after $\mathsf{WF}$ (hence $(\mathsf{P})$) has been established.
+\end{proof}
+\begin{prop}[Open outcomes]\label{prop:openlineage}
+$\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Open}(\mathit{gs})$ iff $\mathsf{LineagePasses}(g)$, $\mathsf{gaps}(\varkappa) = \mathit{gs}$ and $\mathit{gs} \neq [\,]$. In particular a defect takes precedence over a coverage gap. \emph{(Coq: \coq{lineage_check_open}.)}
+\end{prop}
+\begin{proof}
+By the case split above and \cref{lem:defectnone}.
+\end{proof}
+Rejection therefore carries a located, specification-valid defect, while open means that the lineage conditions pass but declared coverage gaps remain.
+
+\subsection{Certificate issuance}
+\begin{thm}[Certificate issuance]\label{thm:issue}
+There is a function $\mathsf{issue}(g,\varkappa) \in \mathsf{Option}(\mathsf{Lin})$ such that $\mathsf{issue}(g,\varkappa) = \mathsf{Some}(\lambda)$ iff $\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Accepted}$, and then $\lambda$ has graph $g$, coverage $\varkappa$, and verdict $\mathsf{Pass}$. \emph{(Coq: \coq{issue_certificate}, \coq{issue_certificate_iff}, \coq{issue_certificate_data}.)}
+\end{thm}
+\begin{proof}
+Define $\mathsf{issue}$ by cases on $\mathsf{defect}(g)$ and $\mathsf{gaps}(\varkappa)$; in the accepting case build the record from $g$, $\varkappa$, the verdict $\mathsf{Pass}$, and the proofs of $\mathsf{WF}$, L1, L2, L3 supplied by \cref{lem:defectnone} and the empty gaps. The iff is \cref{thm:reflect}.
+\end{proof}
+Acceptance thus constructs a kernel-checked certificate. This is strictly stronger than an audit that prints a verdict: the extracted checker returns a value whose type records that the graph passes.
+
+\subsection{What the reflection theorem does not prove}
+It proves equivalence between the Coq checker and the Coq specification. It does \emph{not} prove that the extracted checker agrees with an arbitrary handwritten implementation at the source-language semantic level; extraction remains within the stated trust boundary, and agreement with a handwritten audit is evidence of a different kind (\cref{sec:mechanisation}). Nor does it show that the declared graph contains every real production path.

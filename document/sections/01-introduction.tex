@@ -1,0 +1,40 @@
+\section{Introduction}\label{sec:intro}
+
+\subsection{The limitation of extensional rewriting}
+Ordinary rewriting licenses substitution under a relation: if $x \mathrel{R} y$ and $C$ is a context that respects the relevant relations, then $C[x] \mathrel{R'} C[y]$. This is deliberately extensional. Once $x \mathrel{R} y$ has been established, the step normally does not retain how $x$ and $y$ were connected, which process produced the claimed agreement, whether one side was copied from the other, whether the evidence was independently grounded, whether the transformation has been maintained through time, or whether any obligation remains open.
+
+For mathematical equality this forgetting is harmless, and it is the source of rewriting's power. For audited migrations, provenance-sensitive predicates, certified transformations and assurance arguments it is not always harmless: whether a substitution is \emph{warranted} can depend on exactly the information that a relational proof discards. We call the corresponding problem \emph{lineage-sensitive substitution}.
+
+\subsection{A motivating separation}
+Consider a dual-write migration. Two services record a status for each request, and an execution trace records what actually happened. On an ordinary request all three agree. On one exceptional request both services report success---because one copied the other---while the trace records failure. The two service records agree, so ordinary relational rewriting between them succeeds. If we ``repair'' the disagreement with the trace by defining the trace valuation to be the first service's value, every equation holds, but the ground now descends from the coordinate it was supposed to ground. The endpoint equation is true; its evidential warrant has failed. \Cref{sec:example} works this example out completely.
+
+\subsection{The proposed solution}
+We introduce \emph{grounded transport}. For a declared transport problem $c$, an inhabitant of $\GTrans_c(x,y) : \Type$ is not merely a proof that $x$ and $y$ are related: it carries the evidence by which transport is licensed, as data. Erasure recovers ordinary substitutability in two stages,
+\[
+\GTrans_c(x,y) \;\xrightarrow{\ \erase_1\ }\; \Cross_c(x,y) \;\xrightarrow{\ \erase_2\ }\; R(x,y),
+\]
+first forgetting certificates but keeping the directed crossing, then forgetting the crossing but keeping the relation. The central asymmetry is
+\[
+\GTrans_c(x,y) \Longrightarrow R(x,y), \qquad\text{but in general}\qquad R(x,y) \centernot\Longrightarrow \GTrans_c(x,y).
+\]
+Ordinary rewriting is thus the extensional image of the calculus, not something it abandons.
+
+\subsection{Contributions}
+Each contribution is a theorem about a mechanised calculus; named results refer to the Coq development (\cref{sec:mechanisation}).
+\begin{enumerate}
+\item \textbf{A grounded transport calculus} (\cref{sec:gt}): a directed, proof-relevant judgement carrying extractable seam, exhibition, lineage, coverage and record evidence; identity and composition; and algebraic laws stated modulo an explicit witness equivalence, since literal equality fails.
+\item \textbf{Evidential erasure} (\cref{sec:erasure}): a two-stage erasure, its soundness, the induced preorder, a precise distinction between sound refinement and exact recovery, a proof that erasure does not reflect grounding, a proof that two distinct warrants for the same endpoints erase to the same judgement, and an observational obstruction showing why observational agreement cannot license lineage-sensitive substitution.
+\item \textbf{Contexts at two levels} (\cref{sec:gt,sec:dynamic}): witness-mapping refinements of \texttt{Proper}: \emph{crossing-proper} contexts, which preserve certified crossings, and \emph{certificate-proper} contexts, which additionally preserve complete certificates and require an evidence lift. Both compose, certificate-proper implies crossing-proper implies \texttt{Proper}, and seam evolutions are crossing-proper but certificate-proper only under an evidence lift, which exists in one model and provably cannot in another.
+\item \textbf{A canonical seam instance} (\cref{sec:seams}): recovery of an earlier seam-transport theorem from the generic calculus, with the observation that its conclusion needs only extensional agreement.
+\item \textbf{Dynamic preservation and failure} (\cref{sec:dynamic}): a separation of structural naturality, valuation naturality, preservation of grounding, and coverage, and a model where ordinary rewriting remains valid while grounding is lost.
+\item \textbf{Evidence-bearing assessment} (\cref{sec:assessment}): a problem-indexed three-valued semantics (certified, refuted, open) with located obstructions, soundness against a legacy transportability predicate, and cumulative failure reporting.
+\item \textbf{Certified lineage checking} (\cref{sec:lineage}): a finite lineage audit with a proof of ancestor saturation and an \emph{unconditional} reflection theorem, whose extraction issues kernel-checked certificates.
+\item \textbf{Mechanised and tested evidence} (\cref{sec:mechanisation}): a Coq development that is axiom-free in its kernel, extraction showing that evidential data survive proof erasure, and differential testing---including a stratified test design and a mutation study---of the extracted audit against a handwritten one.
+\end{enumerate}
+We do not claim that equality, setoid rewriting, factorisation, or proof-relevant relations are new. The contribution is their integration into one calculus with the properties above, and the mechanised separation results.
+
+\subsection{Scope and non-claims}
+The calculus does \emph{not} prove that a declared lineage graph is complete; that raw evidence is accurate; that a state model adequately represents a concrete process; that an institutional authority is legitimate or competent; that every transport obligation is decidable; or that ordinary rewriting is unsound. The claim is that ordinary rewriting is \emph{evidentially incomplete} for some applications, and that this can be repaired without giving up its extensional image. The calculus makes explicit what is declared; it does not make declarations true.
+
+\subsection{A note on motivation}
+The design owes something to process philosophy: settled endpoints correspond to coordinate description, and a witness-bearing transition retains something of the production of that agreement. Nothing in the paper depends on that reading. The formal claim is only that endpoint agreement does not exhaust the evidence relevant to a transition (\cref{sec:whitehead}).

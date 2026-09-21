@@ -1,0 +1,51 @@
+\section{Theorem ledger and proof status}\label{app:ledger}
+
+Each row names the Coq identifier(s) of a result of the paper. \emph{Proof in paper} says whether the proof is given in full (\textbf{F}), summarised (\textbf{S}), or omitted (\textbf{M}, mechanised only). Every omitted or summarised proof is mechanised in the artefact, and every identifier below was checked to exist and to be closed under the global context, except where noted.
+
+{\small
+\begin{longtable}{@{}r>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}p{5.4cm}>{\raggedright\arraybackslash}p{2.0cm}c@{}}
+\caption{Theorem spine and its mechanisation.}\label{tab:ledger}\\
+\toprule
+\# & Result & Coq identifier(s) & Text & Proof \\
+\midrule
+\endfirsthead
+\toprule
+\# & Result & Coq identifier(s) & Text & Proof \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+1 & Grounded reflexivity, composition & \coq{grounded_transport_refl}, \coq{grounded_transport_compose} & \cref{thm:refl} & S \\
+2 & Witness algebra modulo $\weq$ & \coq{WEquiv_id_left}, \coq{WEquiv_id_right}, \coq{WEquiv_assoc}, \coq{WEquiv_compose}, \coq{WEquiv_summary} & \cref{thm:algebra} & F \\
+3 & Erasure soundness & \coq{erase_sound}, \coq{rpath_sound}, \coq{erasure_sound} & \cref{thm:soundness} & F \\
+4 & Erased preorder & \coq{erased_PreOrder} & \cref{prop:preorder} & S \\
+4$'$ & Exact recovery under completeness & \coq{erasure_exact_of_complete}, \coq{preorder_complete}, \coq{not_complete_of_gap} & \cref{prop:complete} & M \\
+5 & Erasure non-reflection & \coq{erasure_not_reflecting}, \coq{copied_ungrounded_agreement} & \cref{thm:nonreflect} & F \\
+6 & Same endpoints, different warrants & \coq{packed_warrants_same_endpoints}, \coq{same_endpoints_different_warrants}, \coq{packed_distinguishable} & \cref{thm:multiplicity} & F \\
+6$'$ & Observational obstruction & \coq{fibre_obstruction}, \coq{not_proper_of_distinguished}, \coq{observational_not_grounded}, \coq{obs_equiv_not_transport}, \coq{trace_not_determined_by_copied_value} & \cref{prop:obsobstruction} & F \\
+7 & Composition of witness-preserving contexts & \coq{gp_id}, \coq{gp_comp}, \coq{grounded_proper_compose} & \cref{thm:gpcomp} & F \\
+8 & Two levels: composition, chain, nesting & \coq{crossing_proper_id}, \coq{crossing_proper_comp}, \coq{certificate_proper_id}, \coq{certificate_proper_comp}, \coq{certificate_proper_erased}, \coq{crossing_proper_erased}, \coq{contextual_chain}, \coq{contextual_preservation}, \coq{contextual_preservation_nested}, \coq{grounded_proper_erased}, \coq{grounded_proper_Proper}, \coq{grounded_proper_sound} & \cref{thm:twolevels} & F \\
+8$'$ & Evidence lifting gives certificate-proper & \coq{pm_certificate_proper}, \coq{pm_crossing_proper}, \coq{pm_commute}, \coq{lift_gives_grounding} & \cref{thm:lifting} & F \\
+9 & Grounding erases to pairwise agreement & \coq{original_grounding_erases_to_extensional} & \cref{prop:groundingerases} & F \\
+10 & Pairwise agreement $\not\Rightarrow$ grounding & \coq{pairwise_agreement_not_grounding}, \coq{copied_extensionally_coherent}, \coq{copied_not_grounded} & \cref{prop:pairwise} & F \\
+11 & Original seam transport recovered & \coq{original_seam_transport_from_generic}, \coq{extensional_factor_transport}, \coq{grounded_factor_transport} & \cref{thm:seamtransport,prop:extfactor,cor:groundedfactor} & F \\
+12 & Dynamic separation & \coq{dynamic_failure_visible}, \coq{ordinary_rewriting_still_succeeds}, \coq{structural_naturality_not_preservation} & \cref{thm:dynfail} & F \\
+12$'$ & Naturality preserves grounding on image & \coq{natural_valuations_preserve_grounding_on_image}, \coq{grounding_at_transported_elements} & \cref{thm:preserve} & F \\
+12$''$ & Global preservation under coverage & \coq{surjective_evolution_preserves_all_grounding}, \coq{preservation_without_coverage} & \cref{thm:coverage} & F \\
+12$'''$ & Certificate reissue; no lift when grounding lost & \coq{reissue_certificate_proper}, \coq{no_evidence_lift_when_grounding_lost}, \coq{evolution_crossing_proper} & \cref{thm:reissue} & F \\
+13 & Certification soundness & \coq{certified_transportable_legacy}, \coq{certified_transportable}, \coq{certified_gives_transportable}, \coq{full_iff_legacy_and_authority}, \coq{full_implies_legacy} & \cref{prop:certsound} & F \\
+14 & Refutation soundness (legacy and full) & \coq{located_refutes_legacy}, \coq{institutional_refutes_full}, \coq{located_refutes_transportable}, \coq{refuted_not_transportable}, \coq{obstructions_refute}, \coq{each_obstruction_refutes} & \cref{prop:refsound} & F \\
+15 & Open non-emptiness, status & \coq{assemble_status}, \coq{assemble_open_nonempty} & \cref{prop:open} & F \\
+16 & Cumulative failure reporting & \coq{assemble_refuted_reports_all}, \coq{report_accounts_for_all}, \coq{report_verdict_agrees}, \coq{both_obstructions_reported}, \coq{refuted_verdict_keeps_open_item} & \cref{prop:accumulate} & F \\
+17 & Ancestor saturation & \coq{ancestors_sound}, \coq{ancestors_complete}, \coq{ancestors_iff} & \cref{thm:anc} & F \\
+17$'$ & Reflection of conditions & \coq{wf_defect_none_iff}, \coq{check_L1_reflect}, \coq{undisclosed_none_iff}, \coq{check_L3_reflect} & \cref{lem:reflect} & S \\
+18 & Lineage-check reflection & \coq{lineage_defect_none_iff}, \coq{lineage_check_reflect} & \cref{lem:defectnone,thm:reflect} & F \\
+19 & Rejection evidence, open outcomes & \coq{defect_sound}, \coq{lineage_check_rejected}, \coq{lineage_check_open} & \cref{prop:rejection,prop:openlineage} & S \\
+20 & Certificate issuance & \coq{issue_certificate_iff}, \coq{issue_certificate_data} & \cref{thm:issue} & S \\
+\midrule
+--- & Functional converse of fibre factorisation (classical; \emph{not} axiom-free) & \coq{constant_factors} (isolated file) & \cref{sec:mechanisation} & M \\
+\end{longtable}
+}
+
+\paragraph{Regression evidence (not theorems).}
+The case-study, random, stratified and mutation results of \cref{sec:regression} are produced by the scripts in the artefact's extraction directory; they are tests and are not part of the ledger.

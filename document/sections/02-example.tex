@@ -1,0 +1,29 @@
+\section{A minimal separating example}\label{sec:example}
+
+This section presents the counterexample in full, before any general definitions; it is reused in \cref{sec:erasure,sec:seams,sec:assessment}.
+
+\subsection{The dual-write span}
+Let $\Sigma = \{r_{\mathrm{ok}}, r_*\}$ be a set of requests and take $A = B = \Sigma$ with projections
+\[
+A \xleftarrow{\ \back\ } \Sigma \xrightarrow{\ \fwd\ } B, \qquad \back = \fwd = \mathrm{id}.
+\]
+Let both coordinate predicates be constantly true, $\Phi_A(\back(r)) = \Phi_B(\fwd(r)) = 1$. Then $\Phi_A \circ \back = \Phi_B \circ \fwd$: pairwise, \emph{extensional seam coherence} holds.
+
+\subsection{The independently grounded valuation}
+Let the seam carry its own valuation, exhibited from the execution trace:
+\[
+\Phi_\Sigma(r_{\mathrm{ok}}) = 1, \qquad \Phi_\Sigma(r_*) = 0.
+\]
+At $r_*$ we have $\Phi_A(\back(r_*)) = \Phi_B(\fwd(r_*)) = 1$ but $\Phi_\Sigma(r_*) = 0$: the coordinates agree with each other while disagreeing with the exhibited process.
+
+\subsection{The copied alternative}
+Defining instead $\widetilde{\Phi}_\Sigma = \Phi_A \circ \back$ satisfies all three equations. But its lineage descends from the very coordinate it is supposed to ground, so it fails the lineage requirement of \cref{sec:lineage}. Equational agreement, independent grounding and lineage warrant are thereby three separate things.
+
+\subsection{Requirements}
+The example demands that
+(i) transport retain an \emph{exhibited crossing} (a seam element);
+(ii) grounding refer to an \emph{independent seam valuation};
+(iii) lineage be \emph{data}, not an erased proposition;
+(iv) ordinary agreement be \emph{obtainable by erasure};
+(v) failure report \emph{why} grounding was unavailable.
+The question the calculus answers is: \emph{what must be retained so that the copied and independently grounded transports do not collapse into the same formal object?}

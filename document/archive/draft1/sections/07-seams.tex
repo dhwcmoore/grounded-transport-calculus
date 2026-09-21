@@ -1,0 +1,41 @@
+\section{Grounded seams as a canonical instance}\label{sec:seams}
+
+\subsection{Spans, valuations and three-way grounding}
+A span $A \xleftarrow{\back} \Sigma \xrightarrow{\fwd} B$ carries Boolean valuations $\Phi_A$, $\Phi_B$ and a seam valuation $\Phi_\Sigma$. The \emph{grounding equations} require both coordinate valuations to agree with the independently exhibited seam valuation:
+\[
+\Phi_A(\back(r)) = \Phi_\Sigma(r), \qquad \Phi_B(\fwd(r)) = \Phi_\Sigma(r) \qquad (r \in \Sigma).
+\]
+Contrast \emph{extensional seam agreement}, which is only pairwise: $\Phi_A(\back(r)) = \Phi_B(\fwd(r))$.
+
+The definitions here are those of an earlier, separately published supplement, which we preserve byte-for-byte and build as an independent library (\cref{sec:mechanisation}). Our compatibility layer takes states to be $A + B$ and defines crossing witnesses as paths of crossings, where a crossing at $r$ carries \emph{both} grounding equations against $\Phi_\Sigma$. An earlier reconstruction of this instance used only the pairwise equation; it collapsed exactly the distinction this paper is about, and is retained only as a clearly labelled weaker layer.
+
+\subsection{Grounding erases to extensional coherence}
+\begin{theorem}[Grounding erases]\label{thm:ground-erases}
+$\mathsf{GroundingEquations} \Longrightarrow \forall r,\ \Phi_A(\back(r)) = \Phi_B(\fwd(r))$. (\coq{original_grounding_erases_to_extensional})
+\end{theorem}
+The proof goes through the generic calculus: the equations supply a crossing at every seam element, and erasure yields pairwise agreement.
+
+\subsection{Non-converse}
+\begin{theorem}[Pairwise agreement does not imply grounding]\label{thm:pairwise}
+There exist a span and valuations with pairwise agreement at every seam element but no grounding. (\coq{pairwise_agreement_not_grounding}; from \coq{copied_extensionally_coherent} and \coq{copied_not_grounded})
+\end{theorem}
+The witness is the dual-write example. Its generic reading is \cref{thm:nonreflect}: the legacy counterexample embeds as an instance of ungrounded agreement (\coq{original_copied_counterexample_embeds}), and, conversely, the legacy \coq{copied_not_grounded} is recovered from the generic obstruction (\coq{copied_not_grounded_from_generic}).
+
+\subsection{Extensional factor transport}
+We state the weak theorem first. Let $M_A : A \to O_A$ and suppose $\Phi_A = h \circ M_A$.
+\begin{theorem}[Extensional factor transport]\label{thm:extfactor}
+If extensional seam agreement holds, then $\Phi_B(\fwd(r)) = h(M_A(\back(r)))$ for every $r$. (\coq{extensional_factor_transport})
+\end{theorem}
+
+\subsection{Grounded factor transport}
+\begin{corollary}[Grounded factor transport]\label{cor:groundedfactor}
+If the grounding equations hold and $\Phi_A = h \circ M_A$, then $\Phi_B(\fwd(r)) = h(M_A(\back(r)))$. (\coq{grounded_factor_transport}; in exactly the legacy statement, \coq{original_seam_transport_from_generic})
+\end{corollary}
+The route is $\mathsf{GroundingEquations} \Rightarrow \mathsf{ExtensionalAgreement} \Rightarrow$ factor transport. Both theorems have the \emph{same conclusion}; the grounded one has stronger premises. The interpretation is the point of this paper in miniature:
+\begin{quote}
+\emph{Grounding does not change the endpoint equation. It changes the warrant carried with the use of that equation.}
+\end{quote}
+This is not a weakness to be hidden. The endpoint equation can remain true after the warrant supporting it has failed (\coq{extensional_conclusion_survives_ungrounded}); that is exactly what non-reflection expresses. A reviewer who observes that the earlier theorem uses stronger premises than its conclusion needs is correct, and the observation is part of the contribution.
+
+\subsection{Compatibility}
+The unchanged earlier supplement instantiates the generic calculus, and its transport theorem is recovered from it with the statement unchanged. This establishes continuity and makes clear which material is new: the generic calculus, erasure, contexts, obstruction, and assessment. The earlier supplement's files are checksum-verified in the build (\cref{sec:mechanisation}).

@@ -1,0 +1,54 @@
+\section{The grounded-seam instance}\label{sec:seams}
+
+This section connects the calculus to an earlier grounded-seam development \cite{moore2026} without requiring the reader to consult it: we restate the definitions and the theorem being recovered.
+
+\subsection{Grounding equations}
+A span $A \xleftarrow{\back} \Sigma \xrightarrow{\fwd} B$ carries Boolean valuations $\Phi_A$, $\Phi_B$ and a seam valuation $\Phi_\Sigma$. The \emph{grounding equations} require both coordinate valuations to agree with the independently exhibited seam valuation:
+\[
+\mathsf{GE}:\qquad \Phi_A(\back(r)) = \Phi_\Sigma(r) \quad\text{and}\quad \Phi_B(\fwd(r)) = \Phi_\Sigma(r) \qquad (r \in \Sigma).
+\]
+\emph{Extensional seam agreement} is only pairwise: $\mathsf{EA}:\ \Phi_A(\back(r)) = \Phi_B(\fwd(r))$ for all $r$. A crossing witness $\mathsf{step}(r)$ (\cref{def:gtrans}) is exactly a crossing at which $\mathsf{GE}$ holds; the compatibility layer takes states to be $A + B$ and crossing witnesses as in \cref{def:gtrans}. An earlier reconstruction of this instance used only $\mathsf{EA}$ as the seam condition; it collapsed exactly the distinction this paper concerns, and survives in the development only as a clearly labelled weaker layer.
+
+\subsection{Grounding erases to pairwise agreement}
+\begin{prop}[Grounding erases]\label{prop:groundingerases}
+$\mathsf{GE} \Longrightarrow \mathsf{EA}$, that is, $\Phi_A \circ \back = \Phi_B \circ \fwd$. \emph{(Coq: \coq{original_grounding_erases_to_extensional}.)}
+\end{prop}
+\begin{proof}
+For $r \in \Sigma$, $\mathsf{GE}$ supplies a crossing witness $\mathsf{step}(r) \in \Cross(\mathsf{inl}\,\back(r), \mathsf{inr}\,\fwd(r))$; erasure soundness (\cref{thm:soundness}, at the crossing level) gives $\Phi_A(\back(r)) = \Phi_B(\fwd(r))$. Directly: $\Phi_A(\back(r)) = \Phi_\Sigma(r) = \Phi_B(\fwd(r))$.
+\end{proof}
+
+\subsection{The converse fails}
+\begin{prop}[Pairwise agreement does not imply grounding]\label{prop:pairwise}
+There exist a span and valuations satisfying $\mathsf{EA}$ but not $\mathsf{GE}$. \emph{(Coq: \coq{pairwise_agreement_not_grounding}, from \coq{copied_extensionally_coherent} and \coq{copied_not_grounded}.)}
+\end{prop}
+\begin{proof}
+Take the dual-write span of \cref{sec:example}: $\Sigma = A = B = \{r_{\mathrm{ok}}, r_*\}$, $\back = \fwd = \mathrm{id}$, $\Phi_A = \Phi_B \equiv 1$, $\Phi_\Sigma(r_{\mathrm{ok}}) = 1$, $\Phi_\Sigma(r_*) = 0$. For every $r$, $\Phi_A(\back(r)) = 1 = \Phi_B(\fwd(r))$, so $\mathsf{EA}$ holds. But $\mathsf{GE}$ at $r_*$ would give $\Phi_A(\back(r_*)) = \Phi_\Sigma(r_*)$, that is, $1 = 0$. So $\mathsf{GE}$ fails. (If $\mathsf{EA}$ implied $\mathsf{GE}$ for all spans, it would in particular for this one.)
+\end{proof}
+The generic reading is \cref{thm:nonreflect}: the legacy counterexample embeds as ungrounded agreement in the generic calculus, and, conversely, \coq{copied_not_grounded} is recovered from the generic obstruction (\coq{original_copied_counterexample_embeds}, \coq{copied_not_grounded_from_generic}).
+
+\subsection{Recovering the original theorem}
+The earlier work proves the following \emph{seam transport theorem}: let $M_A : A \to O_A$, $h : O_A \to \bool$, and suppose $\Phi_A = h \circ M_A$.
+\begin{thm}[Seam transport \cite{moore2026}]\label{thm:seamtransport}
+If $\mathsf{GE}$ holds then for every $r \in \Sigma$, $\ \Phi_B(\fwd(r)) = h(M_A(\back(r)))$. \emph{(Coq legacy statement: \coq{seam_transport}; recovered as \coq{original_seam_transport_from_generic}.)}
+\end{thm}
+The compatibility layer proves that the definitions of the earlier work instantiate the generic calculus and derives \cref{thm:seamtransport} \emph{with the statement unchanged}, in two steps that make its logical strength explicit.
+\begin{prop}[Extensional factor transport]\label{prop:extfactor}
+If $\mathsf{EA}$ holds and $\Phi_A = h \circ M_A$ then $\Phi_B(\fwd(r)) = h(M_A(\back(r)))$ for every $r$. \emph{(Coq: \coq{extensional_factor_transport}.)}
+\end{prop}
+\begin{proof}
+$\Phi_B(\fwd(r)) = \Phi_A(\back(r)) = h(M_A(\back(r)))$, by $\mathsf{EA}$ and the factorisation.
+\end{proof}
+\begin{cor}[Grounded factor transport]\label{cor:groundedfactor}
+$\mathsf{GE}$ and $\Phi_A = h \circ M_A$ imply $\Phi_B(\fwd(r)) = h(M_A(\back(r)))$. \emph{(Coq: \coq{grounded_factor_transport}.)}
+\end{cor}
+\begin{proof}
+By \cref{prop:groundingerases}, $\mathsf{GE} \Rightarrow \mathsf{EA}$; apply \cref{prop:extfactor}.
+\end{proof}
+The logical strength is worth stating plainly, and it is a positive result, not a concession:
+\begin{quote}
+\emph{The endpoint equality requires only pairwise extensional agreement and the supplied factorisation. The grounded witness does not change that equality; it records why applying the equality is warranted.}
+\end{quote}
+The conclusion of \cref{thm:seamtransport} can remain true after the warrant supporting it has failed (\coq{extensional_conclusion_survives_ungrounded}): on the dual-write span the endpoint equation holds at every $r$ with the constant factor, while $\mathsf{GE}$ fails. That is precisely what non-reflection expresses. A reader who observes that the earlier theorem has stronger premises than its conclusion needs is correct, and the observation is part of the contribution.
+
+\subsection{Legacy preservation}
+The earlier supplement is retained byte-for-byte and built as a separate library; its authoritative checksums match; its own build-and-check procedure completes; and the new development imports it through a compatibility layer. The original theorem is recovered, not silently redefined. The checksum table belongs to the artefact documentation, not to this paper.

@@ -1,0 +1,28 @@
+\section{Grounded-proper contexts}\label{sec:contexts}
+
+\subsection{Definition}
+A context $F : X \to Y$ is \emph{grounded-proper} between structures $G_X, G_Y$ when it maps witnesses functorially:
+\[
+\mathsf{map}_F : \GTrans_{G_X}(x,y) \to \GTrans_{G_Y}(Fx, Fy),
+\]
+with $\mathsf{map}_F(\mathsf{id}) = \mathsf{id}$ and $\mathsf{map}_F(v \circ w) = \mathsf{map}_F(v) \circ \mathsf{map}_F(w)$. This is stronger than $\Proper$, which maps only proofs of a relation: $\GProper$ preserves the \emph{warrant} for the relation. (\coq{GroundedProper})
+
+\subsection{Identity and composition}
+\begin{theorem}[Grounded-proper composition]\label{thm:gpcomp}
+The identity context is grounded-proper, and if $F$ and $G$ are grounded-proper then so is $G \circ F$. (\coq{gp_id}, \coq{gp_comp}, \coq{grounded_proper_compose})
+\end{theorem}
+
+\subsection{Nested contextual preservation}
+\begin{theorem}[Contextual preservation]\label{thm:ctx}
+If $w : \GTrans(x,y)$ and $C_1,\dots,C_n$ are grounded-proper, then
+\[
+\mathsf{map}_{C_n}\cdots\mathsf{map}_{C_1}(w) : \GTrans\bigl(C_n[\cdots C_1[x]],\ C_n[\cdots C_1[y]]\bigr),
+\]
+and the witness map of a composite context is the composite of witness maps. (\coq{contextual_preservation}, \coq{contextual_preservation_nested})
+\end{theorem}
+
+\subsection{Erased \texttt{Proper}}
+Every grounded-proper context induces an ordinary proper instance for the erased relation, $\Proper(\mathsf{erased}_{G_X} \Rightarrow \mathsf{erased}_{G_Y})\,F$ (\coq{grounded_proper_erased}, \coq{grounded_proper_Proper}). The converse is \emph{not} claimed: a context may preserve endpoint equivalence while discarding or fabricating lineage, so an ordinary $\Proper$ instance does not yield a witness map.
+
+\subsection{Relation to rewriting tactics}
+The development provides semantic combinators and instances, not an automated witness-carrying rewriting tactic. This separates the semantic kernel from later proof engineering: a tactic consuming the kernel should fail only when no suitable witness was supplied or constructed, never because the semantics needed weakening.

@@ -1,0 +1,65 @@
+\section{Evidence-bearing transport assessment}\label{sec:assessment}
+
+\subsection{Component verdicts}
+For each obligation an assessment is one of three things: a positive certificate, located counterevidence, or an identification of what is missing.
+\[
+\Assess(P) \;=\; \mathsf{Discharged}(e) \;+\; \mathsf{Failed}(d) \;+\; \mathsf{Unresolved}(o),
+\]
+where $e$ is positive evidence, $d$ is located counterevidence, and $o$ names the missing evidence or decision. In the development, unresolved reasons include a not-yet-assessed obligation, a missing lineage record, a coverage gap (naming the gaps), an incomplete search, and an undeclared policy.
+
+\subsection{Four diagnostic loci}
+The obligations instantiate four loci: \emph{observation} (the valuation factors through the observations), \emph{construction} (an exhibited seam with independently grounded lineage), \emph{maintenance} (warrant preserved through evolution), and \emph{institution} (a declared rule or authority licenses the transformation). They are diagnostic loci, not a partition: failures can coexist.
+
+\subsection{The assessment type}
+For a transport problem $c$,
+\begin{lstlisting}
+Inductive TransportAssessment (c : EvCandidate) : Type :=
+| Certified : CertifiedTransport c -> TransportAssessment c
+| Refuted   : Obstructions c        -> TransportAssessment c   (* head :: tail *)
+| Open      : list OpenObligation   -> TransportAssessment c.
+\end{lstlisting}
+$\Cert(w)$ carries the evidence warranting transport; $\Refu(os)$ carries a \emph{non-empty} collection of located obstructions; $\Open(ds)$ names the unresolved obligations. The assembly function combines the four component verdicts.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=7mm and 14mm, box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small}, dia/.style={draw,diamond,aspect=2.4,align=center,inner sep=1pt,font=\small}, >=Stealth]
+\node[box] (A) {Component verdicts\\ (four obligations)};
+\node[dia,below=of A] (F) {Any\\ failed?};
+\node[box,right=of F] (R) {\textsf{Refuted}\\ report every failure};
+\node[dia,below=of F] (O) {Any\\ open?};
+\node[box,right=of O] (U) {\textsf{Open}\\ non-empty obligations};
+\node[box,below=of O] (C) {\textsf{Certified}\\ carries the evidence};
+\draw[->] (A) -- (F);
+\draw[->] (F) -- node[above,font=\scriptsize]{yes} (R);
+\draw[->] (F) -- node[left,font=\scriptsize]{no} (O);
+\draw[->] (O) -- node[above,font=\scriptsize]{yes} (U);
+\draw[->] (O) -- node[left,font=\scriptsize]{no} (C);
+\end{tikzpicture}
+\caption{Verdict aggregation. Verdicts are singular; the \emph{report} behind a verdict retains every failed and every open obligation (\cref{thm:report}).}
+\label{fig:aggregation}
+\end{figure}
+
+\subsection{Reports versus verdicts}
+The aggregate verdict and the complete report are different things and we keep them apart. The verdict follows the componentwise rule: no failure and no open obligation gives $\Cert$; at least one failure gives $\Refu$; no failure but at least one open obligation gives $\Open$ (\coq{assemble_status}). The \emph{report} lists every obligation in exactly one of three lists---failed, open, discharged---whatever the verdict.
+\begin{theorem}[Complete reporting]\label{thm:report}
+The verdict of the report is the verdict of the assembled assessment, and every obligation is accounted for exactly once: $|\text{failed}| + |\text{open}| + |\text{discharged}| = 4$. (\coq{report_verdict_agrees}, \coq{report_accounts_for_all})
+\end{theorem}
+The distinction matters. The $\Refu$ constructor itself carries the located failures; if a failure co-occurs with an unresolved obligation, the verdict is $\Refu$ but the open obligation must not vanish because another obligation already refutes transport. It does not: it remains in the report (\coq{refuted_verdict_keeps_open_item}, where a copied ground fails construction while maintenance is unassessed). This was a gap in an earlier form of the development, in which the assembled $\Refu$ value dropped co-occurring open items; it is repaired by separating the report from the verdict.
+
+\subsection{Soundness and characterisation}
+\begin{theorem}[Certification soundness]\label{thm:certsound}
+A certified assessment carries certified transport, and that erases to the legacy $\mathsf{Transportable}$ predicate. An assembled assessment is $\Cert$ exactly when every obligation is discharged. (\coq{certified_gives_transportable}, \coq{assemble_status})
+\end{theorem}
+\begin{theorem}[Refutation soundness]\label{thm:refsound}
+If $o$ is a collection of located obstructions for $c$, no certified transport for $c$ exists, and this holds of \emph{every} member of the collection. (\coq{obstructions_refute}, \coq{each_obstruction_refutes})
+\end{theorem}
+\begin{theorem}[Open transport]\label{thm:open}
+An assembled assessment is $\Open$ iff no obligation has located counterevidence and at least one obligation is unresolved; it neither asserts transportability nor its negation. Moreover an $\Open$ assessment always names at least one unresolved obligation. (\coq{assemble_status}, \coq{underdetermined_iff}, \coq{assemble_open_nonempty})
+\end{theorem}
+\begin{theorem}[Complete failure reporting]\label{thm:allfail}
+A refuted assembly reports \emph{every} failed obligation, in a fixed order (observational, construction, maintenance, institutional). (\coq{assemble_refuted_reports_all})
+\end{theorem}
+Thus assessment is \emph{cumulative} rather than precedence-based: in a model where a copied ground and a lost grounding coexist, both obstructions appear (\coq{both_obstructions_reported}). Verdicts may be singular, but warrant failures are cumulative.
+
+\subsection{Decidable specialisation}
+When every obligation has a decision procedure the open case disappears: the status is then never $\Open$, and $\Cert$ (resp.\ $\Refu$) coincides with transport (resp.\ its negation) for the conjunction of the obligations (\coq{decidable_not_underdetermined}, \coq{decided_certified_iff_transport}, \coq{decided_refuted_iff_not_transport}). A Boolean classifier is thereby a \emph{specialisation} of the evidence-sensitive assessment, not its foundation. General admissibility, institutional adequacy, and real-world lineage completeness are not assumed decidable. The manuscript-level status ``warrant conflict'' cannot arise here, since one assessment of one obligation is exactly one of the three cases.

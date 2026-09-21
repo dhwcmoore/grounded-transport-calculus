@@ -1,0 +1,45 @@
+\section{Theorem ledger}\label{app:ledger}
+
+The main text is organised around the following theorem spine. Each row names the Coq identifier(s) in the accompanying development; helper lemmas are in the supplement. All listed results are closed under the global context (no axioms), except where noted.
+
+{\small
+\begin{longtable}{@{}r>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}p{6.4cm}l@{}}
+\caption{Theorem spine and its mechanisation.}\label{tab:ledger}\\
+\toprule
+\# & Result & Coq identifier(s) & Text \\
+\midrule
+\endfirsthead
+\toprule
+\# & Result & Coq identifier(s) & Text \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+T1 & Grounded reflexivity & \coq{grounded_transport_refl} & \cref{thm:refl} \\
+T2 & Grounded composition & \coq{grounded_transport_compose} & \cref{thm:compose} \\
+T2$'$ & Witness algebra modulo $\weq$ & \coq{WEquiv_id_left}, \coq{WEquiv_id_right}, \coq{WEquiv_assoc}, \coq{WEquiv_compose} & \cref{thm:algebra} \\
+T3 & Erasure soundness & \coq{erase_sound}, \coq{rpath_sound}, \coq{erasure_sound} & \cref{thm:sound} \\
+T4 & Erased preorder & \coq{erased_PreOrder} & \cref{thm:preorder} \\
+T5 & Erasure non-reflection & \coq{erasure_not_reflecting}, \coq{copied_ungrounded_agreement} & \cref{thm:nonreflect} \\
+T6 & Same endpoints, different warrants & \coq{same_endpoints_different_warrants}, \coq{packed_warrants_same_endpoints} & \cref{thm:multiplicity} \\
+T7 & Grounded-proper composition & \coq{gp_id}, \coq{gp_comp} & \cref{thm:gpcomp} \\
+T8 & Nested contextual preservation & \coq{contextual_preservation_nested} & \cref{thm:ctx} \\
+T9 & Grounding erases to extensional agreement & \coq{original_grounding_erases_to_extensional} & \cref{thm:ground-erases} \\
+T10 & Pairwise agreement $\not\Rightarrow$ grounding & \coq{pairwise_agreement_not_grounding} & \cref{thm:pairwise} \\
+T11 & Original seam transport recovered & \coq{original_seam_transport_from_generic} & \cref{cor:groundedfactor} \\
+T12 & Naturality preserves grounding on the image & \coq{natural_valuations_preserve_grounding_on_image} & \cref{thm:preserve} \\
+T13 & Global preservation under coverage & \coq{surjective_evolution_preserves_all_grounding} & \cref{thm:coverage} \\
+T14 & Extensional persistence, grounding loss & \coq{dynamic_failure_visible} & \cref{thm:dynfail} \\
+T15 & Lineage-sensitive obstruction & \coq{not_proper_of_distinguished}, \coq{observational_not_grounded} & \cref{thm:lineage-obs} \\
+T16 & Certification soundness & \coq{certified_gives_transportable}, \coq{assemble_status} & \cref{thm:certsound} \\
+T17 & Refutation soundness & \coq{obstructions_refute}, \coq{each_obstruction_refutes} & \cref{thm:refsound} \\
+T18 & Open-status characterisation & \coq{assemble_status}, \coq{underdetermined_iff}, \coq{assemble_open_nonempty} & \cref{thm:open} \\
+T19 & Complete failure reporting & \coq{assemble_refuted_reports_all}, \coq{report_accounts_for_all}, \coq{report_verdict_agrees} & \cref{thm:allfail,thm:report} \\
+T20 & Lineage-check reflection & \coq{lineage_check_reflect}, \coq{ancestors_iff} & \cref{thm:reflect,thm:anc} \\
+\midrule
+--- & Functional converse of fibre factorisation (classical) & \coq{constant_factors} (isolated file) & \cref{sec:obstruction} \\
+\end{longtable}
+}
+
+\paragraph{Supplement contents.}
+Complete Coq listings; the \texttt{Print Assumptions} transcripts; the legacy checksum tables; build configuration; the extracted OCaml output and its consumers; and the regression harness for the lineage audit. The tactic implementation is not included, as none exists yet.

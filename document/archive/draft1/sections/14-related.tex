@@ -1,0 +1,45 @@
+\section{Relationship to existing formalisms}\label{sec:related}
+
+\paragraph{Equality and setoid rewriting.}
+Ordinary rewriting identifies the relation that contexts must respect; generalised rewriting in type theory makes this systematic with respectful morphisms \cite{sozeau2009}. Grounded transport additionally retains the evidence that licenses the relation in the particular case.
+
+\paragraph{\texttt{Proper} and respectful morphisms.}
+$\GProper$ refines $\Proper$: it maps witnesses, not merely the truth of a relation. Erasure turns grounded-proper contexts into ordinary proper contexts (\cref{sec:contexts}); the converse fails.
+
+\paragraph{Proof-relevant relations.}
+The calculus belongs to the family of proof-relevant relational structures, but adds application-specific certificate and assessment layers oriented towards lineage, maintenance and audit.
+
+\paragraph{Rewriting logic and labelled transitions.}
+Rewriting logic \cite{meseguer1992} and labelled transition systems retain transition labels. A label alone need not contain independently checkable lineage, coverage and warrant evidence. Grounded witnesses can be read as richly certified transition labels; we do not develop this reading formally here.
+
+\paragraph{Categorical transport.}
+Identity, composition and structure-preserving erasure suggest a categorical interpretation \cite{maclane1998}. We claim a category only up to the witness equivalence $\weq$ of \cref{sec:laws}, for which the laws are proved; a stronger claim would require witness equality we do not have.
+
+\paragraph{Proof-carrying systems and certified transformations.}
+Grounded transport resembles proof-carrying code \cite{necula1997} and certified compilation \cite{leroy2009} in carrying evidence across a transformation. Its distinctive concern is that the evidence includes grounding, lineage, open obligations and institutional parameters, not only semantic preservation.
+
+\paragraph{Provenance systems.}
+Provenance systems record derivational histories \cite{buneman2001,cheney2009}. Grounded transport adds claim-relative conditions determining whether that history licenses substitution: a history is not thereby a warrant.
+
+\paragraph{Assurance cases.}
+The certified/refuted/open distinction supports assurance cases that must retain defeaters and unresolved obligations rather than issue only success or failure \cite{bloomfield2020}.
+
+\paragraph{Processual motivation.}
+The settled endpoints correspond to coordinate description; the witness-bearing transition retains something of the production of that agreement \cite{whitehead1929}. The formal calculus does not encode any ontology and should not be read as doing so. It formalises one methodological consequence: endpoint agreement does not exhaust the conditions under which a processual transition warrants substitution. The full treatment, including the taxonomy of warrant debt, is in a companion manuscript \cite{companion}.
+
+\begin{table}[t]
+\centering\small
+\caption{Comparison with related formalisms.}\label{tab:related}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Formalism & Retains & Does not retain (in general) \\
+\midrule
+Setoid rewriting & the relation, context respect & how the relation was established \\
+Rewriting logic / LTS & transition labels & checkable lineage, coverage, warrant \\
+Proof-carrying code & semantic-preservation evidence & grounding independence, open obligations \\
+Provenance & derivational history & when history licenses substitution \\
+Assurance cases & arguments, defeaters & mechanised located obstructions \\
+Grounded transport & seam, lineage, coverage, authority evidence; located failures; open items & real-world adequacy of declared records \\
+\bottomrule
+\end{tabularx}
+\end{table}

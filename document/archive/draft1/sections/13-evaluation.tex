@@ -1,0 +1,41 @@
+\section{Evaluation through separating examples}\label{sec:evaluation}
+
+The examples are \emph{separating models}, not empirical evaluation: each is a small finite structure that shows a distinction is real. They establish that the formal separations hold; they do not establish usability or scalability on production systems.
+
+\subsection{RQ1: Can ordinary agreement survive while grounding fails?}
+\emph{Copied coordinates.} Extensional agreement succeeds and erasure yields ordinary substitutability; grounding fails at $r_*$; assessment is $\Refu$ with a construction obstruction (the declared lineage descends from a coordinate; independently, grounding fails at $r_*$). Ordinary agreement survives while grounded warrant fails (\cref{thm:nonreflect,thm:pairwise}).
+
+\subsection{RQ2: Can structural naturality preserve agreement while losing grounding?}
+\emph{Maintenance failure.} The squares commute; pairwise agreement persists at both stages and ordinary rewriting succeeds; grounding is lost at the transported element; assessment is $\Refu$ with a maintenance obstruction naming the seam element (\cref{thm:dynfail}). The same problem with maintenance unassessed is $\Open$, and with grounded valuations it is $\Cert$: one problem, three outcomes.
+
+\subsection{RQ3: Can several failures be retained simultaneously?}
+\emph{Co-occurrence.} A copied ground together with a lost grounding fails two obligations; both obstructions are reported, in a fixed order, with no first-error precedence discarding the second (\cref{thm:allfail}). A further variant fails one obligation and leaves another open: the verdict is $\Refu$ and the open obligation remains in the report (\cref{thm:report}).
+
+\subsection{RQ4: Can different warrants erase to the same judgement?}
+\emph{Different warrants.} Two witnesses, one within a single problem and one across problems with different declared lineage, connect the same endpoints and erase into the same judgement, while their summaries differ in record, custodian, coverage, authority, and lineage disposition (\cref{thm:multiplicity}).
+
+\subsection{RQ5: Does missing evidence remain distinct from counterevidence?}
+A missing lineage record yields $\Open$; a partial lineage record with declared gaps yields $\Open$ (coverage-qualified, under our declared standard); an explicit invalid lineage path yields $\Refu$. The checked audit distinguishes the last two on the same inputs: a passing graph with gaps is open, and a defect beats a gap.
+
+\begin{table}[t]
+\centering\small
+\caption{Separating examples and outcomes.}\label{tab:examples}
+\begin{tabularx}{\textwidth}{@{}lccY@{}}
+\toprule
+Example & Ordinary relation & Assessment & Located evidence \\
+\midrule
+Valid seam & holds & $\Cert$ & full witness: custodian, record, ground node, verdict \\
+Copied coordinates & holds & $\Refu$ & lineage descent; grounding failure at $r_*$ \\
+Missing lineage record & may hold & $\Open$ & \textit{missing lineage record} \\
+Partial lineage record & may hold & $\Open$ & \textit{coverage gap}, gaps named \\
+Dynamic failure & holds & $\Refu$ & lost grounding at transported element \\
+Co-occurrence & holds & $\Refu$ & construction \emph{and} maintenance obstruction \\
+Failure $+$ open & holds & $\Refu$ & failure reported; open item retained in report \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Lineage audit: regression against the handwritten audit}
+The extracted, checked lineage procedure was compared with the handwritten OCaml audit of the case study, by capturing the latter's printed output. On the five case-study records (live rows; backfill with a disclosed shared ancestor; backfill with the shared ancestor undisclosed; a copied seam valuation; a cyclic record) the two agree on all five, including the malformed cycle. On 3000 randomly generated records, including every malformation kind (duplicate names, undeclared parents, distinguished nodes not derived, relevant inputs not raw, and cycles), the two agree on all 3000. The generated records were 89 grounded, 1403 not grounded, and 1508 malformed.
+
+Two remarks. First, this is a \emph{test}: agreement on these inputs, not equivalence. Second, the harness discriminates. A deliberate mutation of the extracted side---dropping the $d_B$ descent test from L1---was detected by the random test and not by the five case-study records; the case study alone would not have found that fault. The accepting path is exercised less than the rejecting paths, since few random records are grounded.

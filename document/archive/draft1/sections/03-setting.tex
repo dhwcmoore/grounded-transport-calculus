@@ -1,0 +1,26 @@
+\section{Formal setting and design choices}\label{sec:setting}
+
+We fix only the notation needed later; the development is in Coq \cite{coq818}, and we write Coq identifiers in typewriter font.
+
+\subsection{Relations and ordinary rewriting}
+A \emph{directed relation} on a type $X$ is $R : X \to X \to \Prop$. It is \emph{reflexive} and \emph{transitive} in the usual sense; we do not assume symmetry. A function $F : X \to Y$ is \emph{proper} for relations $R$ on $X$ and $S$ on $Y$ when $R(x,y)$ implies $S(F x, F y)$; this is the reading of Coq's \texttt{Proper} (respectful morphisms) in generalised rewriting \cite{sozeau2009}. We use only this much of setoid rewriting: what a context must respect.
+
+\subsection{Proof relevance}
+The distinction that matters is between
+\[
+R(x,y) : \Prop \qquad\text{and}\qquad \GTrans(x,y) : \Type.
+\]
+A proposition can be inhabited only by indistinguishable proofs as far as extraction is concerned; a type-valued judgement can have several distinguishable inhabitants connecting the same endpoints. In Coq, proof fields are erased on extraction while data in \texttt{Type} or \texttt{Set} remain; we use this to place certificate \emph{data} in \texttt{Type} and the proofs that the data satisfy their specifications beside them (\cref{sec:mechanisation}).
+
+\subsection{Why transport is directed}
+A migration, derivation, update or maintenance step may be valid from $x$ to $y$ without licensing reversal. We therefore do not assume symmetry. The erased relation of \cref{sec:erasure} is a preorder, not necessarily an equivalence.
+
+\subsection{Why assessments are problem-indexed}
+Two things must be distinguished: the formal reflexivity of the transport relation, and the assessment of a proposed concrete transport problem. The former licenses formal self-substitution; it does not certify every concrete process whose endpoints happen to be equal. A state may have the same representation before and after a process while its provenance, calibration or authority has changed. Hence:
+\begin{quote}
+\emph{Relational identity is not an assurance certificate for an arbitrary identity-looking transition.}
+\end{quote}
+Assessments (\cref{sec:assessment}) are consequently indexed by a declared transport \emph{problem}, not merely by a pair of endpoints. This is not a technicality: a pair-indexed ``refuted'' would be false at reflexive pairs, where the identity witness needs no certificate.
+
+\subsection{The declared evidence boundary}
+Throughout, two questions are kept apart: whether declared records satisfy their stated conditions (which the kernel checks), and whether the declared records adequately represent the concrete world (which it cannot). The second is where construction and institutional obligations enter (\cref{sec:limitations}).

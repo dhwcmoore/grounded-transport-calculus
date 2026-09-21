@@ -1,0 +1,35 @@
+\section{Finite lineage certificates}\label{sec:lineage}
+
+\subsection{Data model}
+A \emph{lineage record} is finite data: the derived fields with their parents; the raw inputs; the claim-relevant raw inputs; three distinguished nodes $d_A$, $d_B$ and $g$ (the determinations $\Phi_A \circ \back$, $\Phi_B \circ \fwd$ and $\Phi_\Sigma$); and a disposition (justified, or open defeater) for shared ancestors. It is represented as lists of numbers so that it survives extraction.
+
+\subsection{Lineage conditions}
+Write $\anc(x)$ for the strict ancestors of $x$. The valuation $\Phi_\Sigma$ is \emph{lineage-grounded} when:
+\begin{description}
+\item[L1, no descent:] $d_A \notin \anc(g)$ and $d_B \notin \anc(g)$;
+\item[L2, disclosure:] every shared non-raw ancestor of $d_A$ and $d_B$ carries a disposition;
+\item[L3, independent source:] the ground-only ancestry contains a claim-relevant raw input.
+\end{description}
+Well-formedness is part of the requirement: unique names, declared parents, distinguished nodes derived, relevant inputs raw, and acyclicity.
+
+\subsection{Coverage}
+A passing verdict applies only to the declared graph \emph{and} its declared coverage. A partial graph must not be reported as globally lineage-grounded; the record carries its declared gaps, and a passing graph with non-empty gaps is coverage-qualified, hence open, not accepted.
+
+\subsection{A checked decision procedure}
+We define the audit as a function $\mathsf{lineageCheck}(g,c)$ over a lineage record $g$ and coverage record $c$, returning \emph{accepted}, \emph{rejected with a located defect}, or \emph{open with the gaps}. Ancestors are computed by iterating a de-duplicating closure step as many times as there are nodes; the correctness argument is a pigeonhole one and needs only that every parent is a declared node.
+\begin{theorem}[Ancestor correctness]\label{thm:anc}
+$\mathsf{ancestors}$ is sound, and complete when parents are declared: $m \in \mathsf{ancestors}(n) \Longleftrightarrow$ $m$ is a strict ancestor of $n$. (\coq{ancestors_sound}, \coq{ancestors_complete}, \coq{ancestors_iff})
+\end{theorem}
+\begin{theorem}[Lineage-check reflection]\label{thm:reflect}
+Unconditionally,
+\[
+\mathsf{lineageCheck}(g,c) = \mathsf{Accepted} \;\Longleftrightarrow\; \mathsf{LineagePasses}(g) \wedge \mathsf{gaps}(c) = [\,].
+\]
+A rejection is located and its evidence is proved; an open result means exactly that the graph passes while gaps remain. (\coq{lineage_check_reflect}, \coq{defect_sound}, \coq{lineage_check_rejected}, \coq{lineage_check_open})
+\end{theorem}
+Reflection is unconditional, without a well-formedness hypothesis, because well-formedness is itself checked and reflected: soundness and completeness of ancestors are needed to reflect acyclicity. Each of well-formedness, L1, L2 and L3 is separately reflected (\coq{wf_defect_none_iff}, \coq{check_L1_reflect}, \coq{undisclosed_none_iff}, \coq{check_L3_reflect}). An accepted check constructs a kernel-checked certificate whose graph and coverage are the ones checked (\coq{issue_certificate_iff}, \coq{issue_certificate_data}), and a rejection converts to a located construction failure for assessment.
+
+\subsection{The audit boundary}
+It is important to state exactly what is and is not proved. The Coq predicate and the Coq checker are related by \cref{thm:reflect}. The \emph{handwritten} OCaml audit that accompanies the case study is \emph{not} proved equivalent to either; it implements the same stated conditions, and its agreement with the checked procedure is established by regression testing (\cref{sec:evaluation}), not by a theorem.
+
+The extracted checker can take over the decision core: the handwritten code remains as input construction, diagnostic formatting, the case-study driver, and an independent comparison. This is preferable to verifying arbitrary handwritten OCaml against Coq after the fact. We have not yet replaced the handwritten decision core in the supplement, whose files are preserved unchanged.

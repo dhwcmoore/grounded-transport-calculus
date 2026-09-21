@@ -1,0 +1,83 @@
+\section{The grounded transport calculus}\label{sec:calculus}
+
+\subsection{The generic kernel}
+The kernel abstracts what is common to all instances: a proof-relevant, directed judgement with identity, composition, and a soundness map into an ordinary relation.
+
+\begin{definition}[Grounded transport structure]
+Let $X$ be a type and $R$ a relation on $X$. A \emph{grounded transport structure} $G$ for $(X,R)$ consists of a type family $\GTrans_G : X \to X \to \Type$, an identity $\mathsf{id}_x : \GTrans_G(x,x)$, a composition $\GTrans_G(x,y) \to \GTrans_G(y,z) \to \GTrans_G(x,z)$, and a soundness map $\GTrans_G(x,y) \to R(x,y)$.
+\end{definition}
+
+\begin{lstlisting}
+Record GTransport (X : Type) (R : X -> X -> Prop) : Type := {
+  GT : X -> X -> Type;
+  gt_refl : forall x, GT x x;
+  gt_compose : forall x y z, GT x y -> GT y z -> GT x z;
+  gt_sound : forall x y, GT x y -> R x y }.
+\end{lstlisting}
+
+\begin{theorem}[Grounded reflexivity]\label{thm:refl}
+$\mathsf{id}_x : \GTrans_G(x,x)$ for every $x$. (\coq{grounded_transport_refl})
+\end{theorem}
+\begin{theorem}[Grounded composition]\label{thm:compose}
+$\GTrans_G(x,y) \to \GTrans_G(y,z) \to \GTrans_G(x,z)$. (\coq{grounded_transport_compose})
+\end{theorem}
+These are structure fields, so their proofs are immediate; their content is in the instances below. The word ``identity'' means the formal identity of the calculus, not a blanket certification of every temporally extended process with equal endpoints (\cref{sec:setting}).
+
+\subsection{Transport problems}
+A \emph{transport problem} declares what is to be assessed. In the development a problem is a record \coq{EvCandidate} with, in abridged form:
+\begin{itemize}
+\item a span $A \xleftarrow{\back} \Sigma \xrightarrow{\fwd} B$, coordinate valuations $\Phi_A, \Phi_B$, and an independent seam valuation $\Phi_\Sigma$ (all Boolean);
+\item observation maps $M_A, M_B$ for the two coordinates;
+\item a declared finite lineage record (\cref{sec:lineage});
+\item a type of \emph{maintenance evidence}, a type of located maintenance failures, and a function saying that a failure refutes any evidence;
+\item the same triple for \emph{authority} evidence;
+\item summary interfaces for both (\cref{sec:mechanisation}).
+\end{itemize}
+The endpoint relation is agreement of the coordinate valuations. The generic record imposes no institutional record format: maintenance and authority evidence are abstract types supplied by the application.
+
+\subsection{Certificates and grounded witnesses}
+The data-bearing components are records in \texttt{Type}.
+\begin{description}
+\item[Exhibition certificate.] Follows the five conditions of an exhibited seam: a record identifier; stable, injective identifiers of seam elements; a declared process; the retained record together with an evaluator such that the seam valuation is a function of what the record retains (a factorisation obligation); a declared coverage interval; and a custodian.
+\item[Lineage certificate.] Carries the finite lineage graph, a coverage record with its declared gaps, and the issued audit verdict as \emph{data}, together with proofs that the graph is well-formed and satisfies conditions L1--L3 (\cref{sec:lineage}).
+\item[Construction certificate.] An inhabitant of the seam, an exhibition certificate, a lineage certificate \emph{for the declared graph}, and the three-way grounding equations.
+\item[Certified transport.] The observational (admissibility of both coordinates), construction, maintenance and authority evidence together.
+\end{description}
+\begin{lstlisting}
+Inductive RPath (c : EvCandidate) : rstate c -> rstate c -> Type :=
+| rp_refl  : forall x, RPath c x x
+| rp_step  : forall r (ct : CertifiedTransport c),
+               RPath c (inl (back r)) (inr (fwd r))
+| rp_trans : forall x y z, RPath c x y -> RPath c y z -> RPath c x z.
+\end{lstlisting}
+A \emph{grounded transport witness} is an \coq{RPath}: a path of crossings, each carrying a full certified transport. States are the disjoint sum $A + B$; a crossing at seam element $r$ goes from $\back(r)$ to $\fwd(r)$. This is the $\GTrans$ of a generic structure (\coq{rich_structure}), whose soundness is extensional agreement of the coordinate valuations.
+
+Composition is concatenation: each crossing keeps its own certificate, and there is no operation that merges or weakens evidence. Nothing is silently discharged, because witnesses exist only for discharged obligations; unresolved obligations live in assessments, not witnesses (\cref{sec:assessment}).
+
+\subsection{Algebraic laws}\label{sec:laws}
+\coq{RPath} is a \emph{free} structure, so identity and associativity do not hold by literal equality: $\mathsf{trans}(\mathsf{refl}, w)$ is not syntactically $w$. We state them modulo the equivalence
+\[
+w_1 \weq w_2 \;:\Longleftrightarrow\; \mathsf{crossings}(w_1) = \mathsf{crossings}(w_2),
+\]
+where $\mathsf{crossings}$ flattens a witness to the list of its (seam element, certificate) pairs. This forgets bracketing and identity padding and \emph{nothing else}: every seam element and every certificate is compared.
+
+\begin{theorem}[Witness algebra]\label{thm:algebra}
+$\weq$ is an equivalence, composition respects it, and
+\[
+\mathsf{trans}(\mathsf{refl},w) \weq w, \qquad \mathsf{trans}(w,\mathsf{refl}) \weq w, \qquad
+\mathsf{trans}(\mathsf{trans}(w_1,w_2),w_3) \weq \mathsf{trans}(w_1,\mathsf{trans}(w_2,w_3)).
+\]
+Moreover $w_1 \weq w_2$ implies equal extractable summaries. (\coq{WEquiv_id_left}, \coq{WEquiv_id_right}, \coq{WEquiv_assoc}, \coq{WEquiv_compose}, \coq{WEquiv_summary})
+\end{theorem}
+Consequently transport witnesses form a category \emph{up to $\weq$} \cite{maclane1998}; no quotient type is constructed, and we claim nothing stronger. Literal equality of composites is not claimed. This was checked before drafting: the laws hold only modulo $\weq$, and the erased relation satisfies the ordinary preorder laws regardless (\cref{sec:erasure}).
+
+\begin{remark}
+In the single-seam instance a non-identity witness is exactly one crossing (the path $A \to B$ has no continuation), so composition of non-trivial witnesses is degenerate there. Composition earns its keep through contexts and temporal evolution (\cref{sec:contexts,sec:dynamic}), not through long chains in one seam.
+\end{remark}
+
+\subsection{Packed endpoint-indexed warrants}
+Witnesses for different problems inhabit different indexed types. To compare warrants for the same endpoints we package the problem with the witness and an interpretation of its states into a common endpoint type $E$:
+\[
+\mathsf{PackedWarrant}(x,y) \;=\; \sum_{c : \mathsf{Problem}} \sum_{s,t} \bigl(\mathsf{emb}_c(s) = x\bigr) \times \bigl(\mathsf{emb}_c(t) = y\bigr) \times \GTrans_c(s,t).
+\]
+This places warrants from problems with \emph{different} declared lineage into one collection without pretending their lineage records coincide. Erasure of a packed warrant lands in the single proposition $\mathsf{ErasedAt}(x,y)$, which does not record which problem or witness was used (\coq{PackedWarrant}, \coq{erase_packed}).

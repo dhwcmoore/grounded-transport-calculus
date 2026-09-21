@@ -1,0 +1,75 @@
+\section{Erasure}\label{sec:erasure}
+
+\subsection{Two stages}
+Erasure forgets in two stages, and both are lossy.
+
+\paragraph{First erasure: certificates to crossings.}
+$\Cross_c(x,y)$ is the type of \emph{crossing witnesses}: paths of grounded crossings, each crossing carrying the two grounding equations $\Phi_A(\back r) = \Phi_\Sigma(r)$ and $\Phi_B(\fwd r) = \Phi_\Sigma(r)$ but no certificate. The map $\erase_1 : \GTrans_c(x,y) \to \Cross_c(x,y)$ discards exhibition, lineage, coverage, maintenance and authority evidence while keeping the directed path (\coq{rpath_forget}).
+
+\paragraph{Second erasure: crossings to relation.}
+$\erase_2 : \Cross_c(x,y) \to R(x,y)$ maps a crossing path to the extensional agreement of the coordinate valuations at its endpoints (\coq{opath_sound}). The composite $\erase = \erase_2 \circ \erase_1$ yields ordinary substitutability.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=9mm and 26mm, box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small,text width=2.7cm}, lab/.style={align=center,font=\scriptsize}, >=Stealth]
+\node[box] (G) {Grounded witness\\ certificates $+$ crossings};
+\node[box,right=of G] (C) {Crossing witness};
+\node[box,right=of C] (R) {Ordinary relation $R(x,y)$};
+\node[box,below=of G] (S) {Evidence summary (extractable data)};
+\draw[->] (G) -- node[above,lab]{$\erase_1$\\ drop certificates} (C);
+\draw[->] (C) -- node[above,lab]{$\erase_2$\\ drop crossing} (R);
+\draw[->] (G) -- (S);
+\draw[->,dashed,bend left=22] (R.south) to node[below,lab]{cannot reconstruct} (G.south east);
+\end{tikzpicture}
+\caption{Two-stage erasure. The dashed arrow marks what erasure loses irreversibly (\cref{thm:nonreflect,thm:multiplicity}). The evidence summary is a separate, lossy projection that keeps extractable identifiers.}
+\label{fig:erasure}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\caption{Grounded versus ordinary rewriting.}\label{tab:compare}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+ & Ordinary rewriting & Grounded transport \\
+\midrule
+Judgement & $R(x,y) : \Prop$ & $\GTrans_c(x,y) : \Type$ \\
+Inhabitants & Indistinguishable proofs & Distinguishable witnesses \\
+Carries seam / lineage / coverage & No & Yes, as data \\
+Contexts & $\Proper$: preserves the relation & $\GProper$: maps witnesses \\
+Failure & Absence of proof & Located obstruction, or open obligation \\
+Relation to the other & --- & Erases to it; not conversely \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Soundness and the erased preorder}
+\begin{theorem}[Erasure soundness]\label{thm:sound}
+If $w : \GTrans_c(x,y)$ then $R(x,y)$, where $R$ is agreement of the coordinate valuations. (\coq{erase_sound}, \coq{rpath_sound}; generically \coq{erasure_sound})
+\end{theorem}
+For a generic structure $G$ define the \emph{erased relation} $\mathsf{erased}_G(x,y) :\equiv \mathsf{inhabited}(\GTrans_G(x,y))$.
+\begin{theorem}[Erased preorder]\label{thm:preorder}
+$\mathsf{erased}_G$ is reflexive and transitive, and is contained in $R$. (\coq{erased_PreOrder}, \coq{erasure_sound})
+\end{theorem}
+Since composition holds up to $\weq$ (\cref{thm:algebra}) but the erased relation only records inhabitation, the erased relation satisfies the ordinary preorder laws with no qualification.
+
+\subsection{Sound refinement versus exact recovery}
+One must be careful with the word ``recovery''. If the erased relation \emph{is defined} as the image of grounded transport, then $R_G(x,y) \Longleftrightarrow \exists w : \GTrans(x,y)$ holds by definition. If instead one starts from an independently defined relation $R$, the general result is only the soundness map $\GTrans(x,y) \to R(x,y)$. The converse,
+\[
+R(x,y) \Longrightarrow \|\GTrans(x,y)\|,
+\]
+requires a completeness (representability) hypothesis $\mathsf{Complete}(G)$, under which $R$ and $\mathsf{erased}_G$ coincide (\coq{erasure_exact_of_complete}); it holds for the trivial structure whose witnesses are the proofs themselves (\coq{preorder_complete}). It fails in precisely the cases of interest. We therefore call the generic result a \emph{sound refinement}, not an equivalence with all ordinary rewriting.
+
+\subsection{Non-reflection}
+\begin{theorem}[Erasure does not reflect grounding]\label{thm:nonreflect}
+There exist a transport problem $c$ and states $x,y$ with $R(x,y)$ and $\neg\,\mathsf{erased}(x,y)$. (\coq{erasure_not_reflecting}, \coq{copied_ungrounded_agreement})
+\end{theorem}
+\begin{proof}[Instance]
+Take the dual-write problem of \cref{sec:example}, states $x = \mathsf{inl}(r_*)$ and $y = \mathsf{inr}(r_*)$. Both coordinate valuations are true, so $R(x,y)$. Every crossing requires a certified transport, and a certified transport would include the grounding equations at $r_*$, which fail; the declared lineage independently fails L1. So the problem admits no certified transport, and every witness is the identity path; since $x \neq y$, none connects them.
+\end{proof}
+The same fact is a generic \emph{ungrounded agreement}: extensional agreement without a transport witness, whose existence refutes $\mathsf{Complete}$ and hence exact recovery.
+
+\subsection{Same endpoints, different warrants}
+\begin{theorem}[Warrant multiplicity]\label{thm:multiplicity}
+There exist $w_1, w_2 : \mathsf{PackedWarrant}(x,y)$ for the same endpoints such that both erase into $\mathsf{ErasedAt}(x,y)$, while their extractable summaries differ, and hence $w_1 \neq w_2$. (\coq{packed_warrants_same_endpoints}; within one problem \coq{same_endpoints_different_warrants})
+\end{theorem}
+The witnesses in our instance differ in seam element, exhibition record, custodian, coverage interval, authority, and---across problems---declared lineage dispositions. We do not assert equality of the two erased \emph{proofs}: $\mathsf{ErasedAt}$ is a proposition, so equality of its proofs would require proof irrelevance and would be uninformative. The content is that erasure maps both witnesses into one proposition that records nothing about which was used, while the summary separates them. This is the most direct proof that ordinary rewriting forgets evidential structure.

@@ -1,0 +1,8 @@
+; The preserved supplement is compiled as the Rocq library [Exactness].
+; SeamExtraction.v (extraction to OCaml) is intentionally not built here; its
+; checked build is the supplement's own Makefile.
+(subdir
+ exactness-2026
+ (coq.theory
+  (name Exactness)
+  (modules Admissibility GroundedSeam)))

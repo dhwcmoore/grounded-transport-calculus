@@ -1,0 +1,96 @@
+% Grounded Transport: A Proof-Relevant Rewriting Calculus for Lineage-Sensitive Systems
+% Target: Logical Methods in Computer Science (LMCS).  DRAFT 2.
+% Build: make   (uses the official lmcs.cls, downloaded from
+%        https://lmcs.episciences.org/public/lmcs.cls; re-download before submission)
+\documentclass{lmcs}
+
+\usepackage{amssymb}
+\usepackage{booktabs,array,tabularx,longtable,centernot}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage{hyperref}   % loaded here so that cleveref (which must follow it) works with lmcs.cls
+\usepackage{xurl}
+\usepackage[capitalise,noabbrev]{cleveref}
+
+\emergencystretch=3em
+
+% ---------- cross-reference names for LMCS environments ----------
+\crefname{thm}{Theorem}{Theorems}
+\crefname{lem}{Lemma}{Lemmas}
+\crefname{prop}{Proposition}{Propositions}
+\crefname{cor}{Corollary}{Corollaries}
+\crefname{defi}{Definition}{Definitions}
+\crefname{exa}{Example}{Examples}
+\crefname{rem}{Remark}{Remarks}
+
+% ---------- macros ----------
+\DeclareUrlCommand\coq{\def\UrlFont{\ttfamily\small\upshape}}   % Coq identifiers (breakable)
+\newcommand{\GTrans}{\mathsf{GTrans}}
+\newcommand{\Cross}{\mathsf{Cross}}
+\newcommand{\erase}{\mathsf{erase}}
+\newcommand{\erased}{\mathsf{erased}}
+\newcommand{\Prop}{\mathsf{Prop}}
+\newcommand{\Type}{\mathsf{Type}}
+\newcommand{\back}{\mathrm{back}}
+\newcommand{\fwd}{\mathrm{fwd}}
+\newcommand{\Cert}{\mathsf{Certified}}
+\newcommand{\Refu}{\mathsf{Refuted}}
+\newcommand{\Open}{\mathsf{Open}}
+\newcommand{\Proper}{\mathsf{Proper}}
+\newcommand{\GProper}{\mathsf{GroundedProper}}
+\newcommand{\anc}{\mathrm{anc}}
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\bool}{\mathbb{B}}
+\newcommand{\val}{\mathrm{val}}
+\newcommand{\Adm}{\mathrm{Adm}}
+\newcommand{\Tr}{\mathsf{Transportable}}
+\newcommand{\weq}{\mathrel{\simeq}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+\title[Grounded Transport]{Grounded Transport: A Proof-Relevant Rewriting Calculus for Lineage-Sensitive Systems}
+
+\author[D.~Moore]{Duston Moore}
+\address{Independent Researcher, Edmonton, Alberta, Canada}
+\email{dhwcmoore@gmail.com}
+
+\keywords{proof-relevant rewriting, transport, erasure, provenance and lineage, mechanised metatheory, Coq, certified decision procedures, extraction}
+\ACMCCS{[{\bf Theory of computation}]: Logic---Logic and verification; Equational logic and rewriting; Type theory}
+
+\begin{abstract}
+\noindent
+Ordinary rewriting records that one expression may replace another under an extensional relation.
+In lineage-sensitive systems this is not always enough: whether a substitution is warranted may also depend on the process connecting the terms, on whether that process was independently grounded, on whether its evidence has been maintained through time, and on which obligations remain unresolved.
+We introduce a directed, proof-relevant transport calculus in which this warrant is carried as extractable data.
+Erasure, in two stages, recovers ordinary substitutability; we prove that erasure is sound, that it does not reflect grounding, and that distinct warrants can erase to the same judgement.
+Contexts are treated at two levels: crossing-proper contexts preserve certified crossings, and certificate-proper contexts additionally preserve complete certificates and need an evidence lift; both compose and erase to ordinary \texttt{Proper} contexts.
+Instantiated on grounded seams, the calculus recovers an earlier seam-transport theorem, separates structural naturality from preservation of grounding, and yields located obstructions to substitution.
+Assessment is problem-indexed and three-valued (certified, refuted, open), retains every located failure, and treats missing evidence as unresolved rather than refuted.
+A finite lineage audit is proved to reflect its specification, and its extraction issues kernel-checked certificates.
+The development is mechanised in Coq, axiom-free in its kernel; extraction to OCaml shows that certificates, lineage graphs and obstructions survive proof erasure, and differential testing, including a mutation study, compares the extracted audit with a handwritten one.
+The calculus does not establish that declared records are complete or accurate; it makes precisely explicit what is being declared.
+\end{abstract}
+
+\maketitle
+
+\input{sections/01-introduction}
+\input{sections/02-example}
+\input{sections/03-setting}
+\input{sections/04-grounded-transport}
+\input{sections/05-erasure}
+\input{sections/06-seams}
+\input{sections/07-dynamic}
+\input{sections/08-assessment}
+\input{sections/09-lineage}
+\input{sections/10-mechanisation}
+\input{sections/11-related}
+\input{sections/12-discussion}
+\input{sections/13-conclusion}
+
+\bibliographystyle{alphaurl}
+\bibliography{refs}
+
+\appendix
+\input{sections/appendix-ledger}
+
+\end{document}

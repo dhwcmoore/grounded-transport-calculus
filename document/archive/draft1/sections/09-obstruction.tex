@@ -1,0 +1,18 @@
+\section{Obstructions to substitution}\label{sec:obstruction}
+
+\subsection{Fibre obstruction}
+Let $M : X \to O$ be an observation map and $\Phi : X \to V$ a predicate. $\Phi$ factors through $M$ iff it is constant on the fibres of $M$; this is the established factorisation criterion, a set-theoretic form of the Doob--Dynkin lemma and of the exactness condition of abstract interpretation \cite{cousot1977}, and we use it as such. A pair $x,y$ with $M(x) = M(y)$ and $\Phi(x) \neq \Phi(y)$ certifies that $\Phi$ cannot be determined from the observations alone (\coq{fibre_obstruction}). The direction from factorisation to fibre-constancy and the relational converse are constructive (\coq{factors_constant}, \coq{constant_relational}); the finite converse needs a complete enumeration and decidable equality (\coq{finite_constant_factors}); the unrestricted functional converse needs classical choice and is isolated (\cref{sec:mechanisation}).
+
+\subsection{Lineage-sensitive obstruction}
+\begin{theorem}[Observational agreement cannot license lineage-sensitive substitution]\label{thm:lineage-obs}
+If $M(x) = M(y)$ and a predicate $L$ has $L(x) \neq L(y)$, then $\neg\,\Proper(\sim_M, =)(L)$. Moreover, if grounded transport is sound for agreement of $L$, then no transport witness connects $x$ and $y$. (\coq{not_proper_of_distinguished}, \coq{observational_insufficient}, \coq{observational_not_grounded})
+\end{theorem}
+The instance is the dual-write example: the copied value is identical on both requests, yet the exhibited trace status separates them, so the trace status is not determined by the copied value (\coq{trace_not_determined_by_copied_value}). The stronger, grounded reading is that observational equivalence $M(x) = M(y)$ does not imply $\GTrans(x,y)$.
+
+\subsection{Located obstruction data}
+Failures are represented as data that names the defect, not as a Boolean. The construction obligation can fail by: an empty seam; a seam element on which a coordinate valuation departs from the seam valuation; a defeated exhibition; a lineage descent (an ancestor path from a coordinate to the ground); an undisclosed shared ancestor (naming the node); the absence of an independent claim-relevant source; or a malformed lineage record. The observational obligation fails by a \emph{fibre witness} (a pair of states). The maintenance obligation, for temporal systems, fails by either the absence of any structural evolution or, for every evolution, a named seam element at which grounding is lost. Authority failure is a type supplied by the application.
+
+Each located failure comes with a proof that it refutes the corresponding evidence, so a failure is not merely a label but a counter-argument (\coq{located_refutes}).
+
+\subsection{Obstruction versus absence of evidence}
+A located obstruction warrants rejection. A missing record may instead leave the assessment open. A missing lineage record, a lineage record with declared coverage gaps, and an incomplete finite search are all \emph{unresolved}, not refuted; only a proved defect refutes. Keeping these apart is what allows the assessment of \cref{sec:assessment} to avoid collapsing three different situations into one negative answer.

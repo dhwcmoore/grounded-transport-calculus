@@ -1,0 +1,116 @@
+\section{Evidence-bearing assessment}\label{sec:assessment}
+
+\subsection{Component states}
+Each of four obligations of a problem $c$ is assessed separately. For an obligation with evidence type $E$ and located-failure type $F$, a \emph{component verdict} is one of
+\[
+\mathsf{Discharged}(e),\quad e \in E; \qquad \mathsf{Failed}(f),\quad f \in F; \qquad \mathsf{Unresolved}(o),
+\]
+where $o$ names the missing evidence or decision (a not-yet-assessed obligation, a missing lineage record, a declared coverage gap, an incomplete search, or an undeclared policy). The four obligations are \emph{observation} ($E = \Adm(M_A,\Phi_A) \wedge \Adm(M_B,\Phi_B)$), \emph{construction} ($E = \mathsf{Con}(c)$), \emph{maintenance} ($E = \mathrm{Mnt}$) and \emph{institution} ($E = \mathrm{Aut}$).
+
+\subsection{Located evidence}
+A failure names the defect, and where possible carries data locating it, rather than being merely a proof of a negated proposition (\cref{tab:failures}). Each carries a proof that it refutes the corresponding evidence, so it is a counter-argument.
+\begin{table}[t]
+\centering\small
+\caption{Located failures, the evidence each refutes, and what each carries. \emph{Data} survives extraction; \emph{proof} does not (only the constructor tag remains).}\label{tab:failures}
+\begin{tabularx}{\textwidth}{@{}llYY@{}}
+\toprule
+Obligation & Failure & Conjunct refuted & Carries \\
+\midrule
+Observation & fibre witness ($A$ or $B$) & $\Adm(M,\Phi)$ & data: states $s_1,s_2$; proof: $M s_1 = M s_2$, $\Phi s_1 \neq \Phi s_2$ \\
+Construction & empty seam & $\mathsf{Inh}(\Sigma)$ & --- \\
+ & grounding failure & $\mathsf{GE}$ & data: seam element $r$; proof: which equation fails \\
+ & exhibition defeated & $\mathsf{Inh}(\mathsf{Exh}(c))$ & --- \\
+ & lineage descent & L1 & proof: an ancestor derivation from a coordinate to the ground (tag only after extraction) \\
+ & undisclosed shared ancestor & L2 & data: the node $n$; proof: it is a shared, non-raw, undispositioned ancestor \\
+ & no independent source & L3 & --- \\
+ & malformed record & well-formedness & proof of the violation; the checker of \cref{sec:lineage} additionally reports which condition \\
+Maintenance & lost grounding, or no evolution & $\mathsf{Inh}(\mathrm{Mnt})$ & data: for every evolution, a seam element where grounding is lost \\
+Institution & application-defined & $\mathsf{Inh}(\mathrm{Aut})$ & application-defined \\
+\bottomrule
+\end{tabularx}
+\end{table}
+The maintenance failure of \cref{thm:dynfail} is the typical case: for the unique evolution the seam element $\ast$ is grounded at stage $0$ and its image is not grounded at stage $1$.
+
+\subsection{Report and verdict}
+We keep two things apart: the complete component \emph{report}, and its aggregate \emph{verdict}.
+\begin{defi}[Assembly]\label{def:assembly}
+Given component verdicts $v_1,\dots,v_4$ (in the order observation, construction, maintenance, institution), let $\mathsf{failures}$ be the list of located failures among them, in that order; $\mathsf{opens}$ the list of unresolved obligations; and $\mathsf{discharged}$ the list of discharged ones. The \emph{report} is the triple $(\mathsf{failures},\mathsf{opens},\mathsf{discharged})$. The \emph{assessment} $\mathsf{assemble}(v_1,\dots,v_4)$ is
+\[
+\begin{cases}
+\Refu(\mathsf{failures}) & \text{if } \mathsf{failures} \neq [\,],\\
+\Cert(\kappa) & \text{if all four are discharged, with $\kappa$ assembled from their evidence},\\
+\Open(\mathsf{opens}) & \text{otherwise.}
+\end{cases}
+\]
+\end{defi}
+The rule is: any failure gives $\Refu$; otherwise any unresolved obligation gives $\Open$; otherwise the evidence assembles into $\Cert$. (\cref{fig:aggregation}.) Verdicts may be singular, but warrant failures are cumulative.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=7mm and 14mm, box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small}, dia/.style={draw,diamond,aspect=2.4,align=center,inner sep=1pt,font=\small}, >=Stealth]
+\node[box] (A) {Component verdicts\\ (four obligations)};
+\node[dia,below=of A] (F) {Any\\ failed?};
+\node[box,right=of F] (R) {$\Refu$\\ report every failure};
+\node[dia,below=of F] (O) {Any\\ open?};
+\node[box,right=of O] (U) {$\Open$\\ non-empty obligations};
+\node[box,below=of O] (C) {$\Cert$\\ carries the evidence};
+\draw[->] (A) -- (F);
+\draw[->] (F) -- node[above,font=\scriptsize]{yes} (R);
+\draw[->] (F) -- node[left,font=\scriptsize]{no} (O);
+\draw[->] (O) -- node[above,font=\scriptsize]{yes} (U);
+\draw[->] (O) -- node[left,font=\scriptsize]{no} (C);
+\end{tikzpicture}
+\caption{Verdict aggregation. The $\Refu$ value carries the located failures; the \emph{report} behind a verdict additionally retains every open and discharged obligation.}
+\label{fig:aggregation}
+\end{figure}
+
+The distinction between report and verdict matters. If a failure co-occurs with an unresolved obligation the verdict is $\Refu$, but the unresolved obligation must not disappear merely because another obligation already refutes transport. It does not: it remains in the report. (In an earlier form of the development the assembled $\Refu$ value alone was the record, and dropped co-occurring open items; the report was introduced to repair this.)
+
+\subsection{Assessment theorems}
+The earlier work defines a transportability predicate $\mathsf{Transportable}$ with three \emph{abstract} propositional slots (exhibition, lineage grounding, functoriality); ``the'' legacy predicate is therefore a family. We use one instantiation and one strengthening, and keep them distinct:
+\begin{align*}
+\Tr_{\mathrm{leg}}(c) \;:\equiv\;{} & \mathsf{Inh}(\Sigma) \wedge \mathsf{Inh}(\mathsf{Exh}(c)) \wedge \mathsf{LineagePasses}(\ell) \wedge \Adm(M_A,\Phi_A)\\
+& \wedge\ \Adm(M_B,\Phi_B) \wedge \mathsf{GE} \wedge \mathsf{Inh}(\mathrm{Mnt}),\\
+\Tr(c) \;:\equiv\;{} & \Tr_{\mathrm{leg}}(c) \wedge \mathsf{Inh}(\mathrm{Aut}),
+\end{align*}
+where $\mathsf{Inh}(T) = \|T\|$. $\Tr_{\mathrm{leg}}(c)$ is the legacy predicate with its slots instantiated by inhabitation of the exhibition and maintenance evidence and by $\mathsf{LineagePasses}$. It contains no authority conjunct. $\Tr(c)$ adds one, and is therefore \emph{strictly stronger}: refuting $\Tr(c)$ does not in general refute $\Tr_{\mathrm{leg}}(c)$, because an authority failure refutes only the extra conjunct. The statements below are made at the correct level. \emph{(Coq: \coq{TransportableLegacy} for $\Tr_{\mathrm{leg}}$, \coq{TransportableFull} for $\Tr$; \coq{full_iff_legacy_and_authority}.)}
+
+\begin{prop}[Certification soundness]\label{prop:certsound}
+If $\mathsf{assemble}(v_1,\dots,v_4) = \Cert(\kappa)$ then $\kappa \in \mathsf{Cert}(c)$, $\Tr_{\mathrm{leg}}(c)$ holds, and $\Tr(c)$ holds. \emph{(Coq: \coq{certified_transportable_legacy}, \coq{certified_transportable}, \coq{certified_gives_transportable}.)}
+\end{prop}
+\begin{proof}
+By \cref{def:assembly}, $\kappa$ is built from four discharged component verdicts, so $\kappa \in \mathsf{Cert}(c)$. Now read off each conjunct of $\Tr_{\mathrm{leg}}(c)$: $\mathsf{Inh}(\Sigma)$ from the inhabitant $\sigma_0$ of the construction certificate; $\mathsf{Inh}(\mathsf{Exh}(c))$ from its exhibition certificate; $\mathsf{LineagePasses}(\ell)$ because the lineage certificate has graph $\ell$ and carries proofs of well-formedness and L1--L3; the two admissibility conjuncts from the observation evidence; $\mathsf{GE}$ from the construction certificate; $\mathsf{Inh}(\mathrm{Mnt})$ from the maintenance evidence. The extra conjunct $\mathsf{Inh}(\mathrm{Aut})$ of $\Tr(c)$ comes from the authority evidence.
+\end{proof}
+
+\begin{prop}[Refutation soundness]\label{prop:refsound}
+(a) Every \emph{non-institutional} located failure $f$ for $c$ refutes the legacy instantiation: $\neg\,\Tr_{\mathrm{leg}}(c)$, hence also $\neg\,\Tr(c)$.
+(b) An \emph{institutional} (authority) failure refutes $\Tr(c)$, via the authority conjunct, and does not refute $\Tr_{\mathrm{leg}}(c)$.
+(c) Consequently every located failure refutes $\Tr(c)$; if $\mathsf{assemble}(v_1,\dots,v_4) = \Refu(F)$ then $\neg\,\Tr(c)$ and $\mathsf{Cert}(c) = \emptyset$, and this holds of \emph{every} member of $F$. If moreover $F$ contains a non-institutional failure, then $\neg\,\Tr_{\mathrm{leg}}(c)$.
+\emph{(Coq: \coq{located_refutes_legacy}, \coq{institutional_refutes_full}, \coq{located_refutes_transportable}, \coq{refuted_not_transportable}, \coq{located_refutes}, \coq{obstructions_refute}, \coq{each_obstruction_refutes}.)}
+\end{prop}
+\begin{proof}
+(a) Assume $\Tr_{\mathrm{leg}}(c)$ and case on $f$ (\cref{tab:failures}). A fibre witness contradicts admissibility: if $\Phi = h \circ M$ and $M s_1 = M s_2$ then $\Phi s_1 = h(M s_1) = h(M s_2) = \Phi s_2$, contradicting $\Phi s_1 \neq \Phi s_2$. An empty seam contradicts $\mathsf{Inh}(\Sigma)$; a grounding failure at $r$ contradicts the grounding equation at $r$; a defeated exhibition contradicts $\mathsf{Inh}(\mathsf{Exh}(c))$; lineage descent, an undisclosed shared ancestor, the absence of an independent source, and a malformed record contradict, respectively, L1, L2, L3 and well-formedness, all components of $\mathsf{LineagePasses}(\ell)$. A maintenance failure contradicts $\mathsf{Inh}(\mathrm{Mnt})$ by the refutation function of \cref{def:problem}. Since $\Tr(c)$ implies $\Tr_{\mathrm{leg}}(c)$, $\neg\Tr_{\mathrm{leg}}(c)$ gives $\neg\Tr(c)$.
+(b) An authority failure contradicts $\mathsf{Inh}(\mathrm{Aut})$ by the refutation function of \cref{def:problem}, hence $\Tr(c)$. It says nothing about the conjuncts of $\Tr_{\mathrm{leg}}(c)$, none of which mentions authority; so this argument cannot refute the legacy predicate, and we do not claim it does.
+(c) Combine (a) and (b). Since $\mathsf{Cert}(c)$ erases into $\Tr(c)$ by \cref{prop:certsound}, $\mathsf{Cert}(c) = \emptyset$. The final clauses apply (a) to a non-institutional member of $F$.
+\end{proof}
+
+\begin{prop}[Open non-emptiness and status characterisation]\label{prop:open}
+$\mathsf{assemble}(v_1,\dots,v_4)$ is $\Open(D)$ iff no component is $\mathsf{Failed}$ and at least one is $\mathsf{Unresolved}$; then $D \neq [\,]$, and $D$ names exactly the unresolved obligations. It is $\Cert$ iff every component is $\mathsf{Discharged}$, and $\Refu$ iff some component is $\mathsf{Failed}$. \emph{(Coq: \coq{assemble_status}, \coq{assemble_open_nonempty}.)}
+\end{prop}
+\begin{proof}
+By \cref{def:assembly} the first case applies iff $\mathsf{failures} \neq [\,]$, iff some component is $\mathsf{Failed}$. Otherwise no component is $\mathsf{Failed}$, so each of the four is $\mathsf{Discharged}$ or $\mathsf{Unresolved}$; if all are $\mathsf{Discharged}$ the second case applies, and otherwise some component is $\mathsf{Unresolved}$, so $D = \mathsf{opens}$ contains it and $D \neq [\,]$. The naming claim is the definition of $\mathsf{opens}$.
+\end{proof}
+An open assessment neither asserts transportability nor its negation.
+
+\begin{prop}[Cumulative failure reporting]\label{prop:accumulate}
+If $\mathsf{assemble}(v_1,\dots,v_4) = \Refu(F)$ then $F$ contains, in the fixed order observation, construction, maintenance, institution, the located failure of \emph{every} failed component and nothing else. Moreover the report accounts for each obligation exactly once: $|\mathsf{failures}| + |\mathsf{opens}| + |\mathsf{discharged}| = 4$, and the verdict of the report equals that of the assembled assessment. \emph{(Coq: \coq{assemble_refuted_reports_all}, \coq{report_accounts_for_all}, \coq{report_verdict_agrees}.)}
+\end{prop}
+\begin{proof}
+$F = \mathsf{failures}$ is the concatenation, in order, of four lists, the $i$-th of which is the singleton $[f_i]$ if $v_i = \mathsf{Failed}(f_i)$ and empty otherwise. Each $v_i$ is exactly one of $\mathsf{Discharged}$, $\mathsf{Failed}$, $\mathsf{Unresolved}$, so it contributes one element to exactly one of the three lists, giving total length $4$. The verdict of the report is $\Refu$ when $\mathsf{failures} \neq [\,]$, else $\Open$ when $\mathsf{opens} \neq [\,]$, else $\Cert$, which is the case split of \cref{def:assembly}.
+\end{proof}
+Assessment is therefore \emph{cumulative} rather than precedence-based. Two examples in the development show this. A model with a copied ground \emph{and} a lost grounding fails two obligations, and both obstructions are reported, in order (\coq{both_obstructions_reported}). A model with a copied ground and maintenance not yet assessed has verdict $\Refu$ with one failure, and the unresolved maintenance obligation remains in the report (\coq{refuted_verdict_keeps_open_item}).
+
+\subsection{Decidability}
+Assembly is a total function once component verdicts have been supplied. That does not make the underlying obligations decidable: arbitrary admissibility is not generally decidable; lineage is decidable for the finite declared graph (\cref{sec:lineage}); institutional adequacy depends on supplied records and policies; and missing evidence yields $\Open$. When every obligation \emph{is} decidable, the open case disappears: the status is never $\Open$, $\Cert$ holds exactly when the conjunction of the obligations does, and $\Refu$ exactly when it does not (\coq{decidable_not_underdetermined}, \coq{decided_certified_iff_transport}, \coq{decided_refuted_iff_not_transport}). A Boolean classifier is thereby a \emph{specialisation} of the evidence-sensitive assessment, not its foundation.
+
+\subsection{Interpretation}
+The four obligations are diagnostic loci, not a partition: failures can and do coexist, which is why reports are cumulative. In the author's earlier manuscript they are called construction, observational, maintenance and institutional \emph{Warrant Debt} \cite{moore2026}; we use that vocabulary only here. The distinction between construction and maintenance is temporal and evidential: a ground that was never independently constituted is a construction failure; a ground that was valid at issuance and later ceased to agree is a maintenance failure. When the issuance record is absent, the causal classification may itself be unresolved.

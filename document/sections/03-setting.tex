@@ -1,0 +1,15 @@
+\section{Preliminaries}\label{sec:setting}
+
+We fix only the notation needed later. The development is in Coq \cite{coq818}; we cite Coq identifiers in typewriter font so that each statement can be located in the artefact.
+
+\paragraph{Relations and contexts.}
+A \emph{directed relation} on a type $X$ is $R : X \to X \to \Prop$. We do not assume symmetry, since a migration, derivation or update may be valid from $x$ to $y$ without licensing reversal. A function $F : X \to Y$ is \emph{proper} for relations $R$ on $X$ and $S$ on $Y$ if $R(x,y)$ implies $S(Fx,Fy)$; this is the reading of Coq's \texttt{Proper} in generalised rewriting \cite{sozeau2009}. We use only this much of setoid rewriting: what a context must respect.
+
+\paragraph{Proof relevance and extraction.}
+The distinction that matters is between $R(x,y) : \Prop$ and $\GTrans(x,y) : \Type$. A type-valued judgement can have several distinguishable inhabitants connecting the same endpoints. In Coq, proof fields are erased on extraction, while data in \texttt{Type} remain; we place certificate \emph{data} in \texttt{Type} and the proofs that the data satisfy their specifications beside them. This is what lets extracted programs inspect evidence (\cref{sec:mechanisation}).
+
+\paragraph{Lists, decidability, constructivity.}
+$\mathsf{In}(x,l)$ is list membership; $l \mathbin{+\!\!+} l'$ is concatenation; $\mathsf{dedup}(l)$ removes duplicates. Except for one isolated theorem (\cref{sec:mechanisation}), all constructions are constructive.
+
+\paragraph{The declared-evidence boundary.}
+Throughout, two questions are kept apart: whether \emph{declared} records satisfy their stated conditions, which the kernel checks, and whether the declared records adequately represent the concrete world, which it cannot. The second is where the limits of \cref{sec:limitations} come from.

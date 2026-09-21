@@ -1,0 +1,44 @@
+\section{Related work}\label{sec:related}
+
+We do not claim that proof relevance, provenance, labelled transitions or certified transformation are new. The contribution is a calculus that combines witness-bearing rewriting with lineage conditions, coverage, cumulative obstruction reporting and open assessment, together with the erasure results that relate it to ordinary rewriting. For each neighbouring formalism we ask what evidential structure it retains and what grounded transport adds or refuses to erase.
+
+\paragraph{Generalised rewriting and \texttt{Proper} (Sozeau).}
+Generalised rewriting in Coq \cite{sozeau2009} lets a rewrite step be justified by a relation and by \texttt{Proper} (respectful) instances, resolved by type-class search; relations and their proofs are propositions. A rewriting step therefore yields a proof term, but relatedness itself is an indistinguishable proposition, so the way it was established is not data an extracted program can inspect. Grounded transport keeps this framework as its extensional image: erasure returns an ordinary preorder (\cref{prop:preorder}) and certificate-proper and crossing-proper contexts erase to \texttt{Proper} instances (\cref{thm:twolevels}). What it adds is a type-valued judgement whose inhabitants are distinguishable (\cref{thm:multiplicity}) and a notion of context that maps witnesses. It also drops symmetry: transport is directed, and the erased relation is a preorder, not necessarily a setoid.
+
+\paragraph{Proof-relevant logical relations (Benton, Hofmann, Nigam).}
+Proof-relevant logical relations \cite{benton2014} equip relations with witnesses of relatedness that can be composed, so that relatedness records how it was established; they are used to justify effect-dependent program transformations. The shared idea is that a relation should carry evidence. The purpose differs: their witnesses are semantic and internal to a proof about programs, whereas ours record externally declared process evidence (seam, exhibition record, lineage, coverage, authority), are assessed against conditions that can fail or remain unresolved, and are designed to survive extraction. We do not claim that proof-relevant relations are new, and we do not prove effect-based transformation results.
+
+\paragraph{Groupoid interpretations and non-trivial proof identity (Hofmann, Streicher).}
+The groupoid model shows that identity proofs need not be unique \cite{hofmann1994,hofmann1998}: distinct proofs of the same equation can be distinguished. Distinguishable witnesses between the same endpoints are the same phenomenon in our setting (\cref{thm:multiplicity}). But our structure is directed and free, is a category only up to the crossing-sequence equivalence (\cref{thm:algebra}), has no inverses, and makes no claim about identity types or higher structure. What we add is not higher homotopy but an account of \emph{which} extractable data distinguish witnesses, and of what erasure forgets.
+
+\paragraph{Provenance semirings (Green, Karvounarakis, Tannen).}
+Provenance semirings \cite{green2007} annotate tuples with elements of a commutative semiring and propagate the annotations through positive relational algebra, retaining, in the universal case, a polynomial describing how each tuple was derived; the survey \cite{cheney2009} places this beside why- and where-provenance \cite{buneman2001}. This retains the multiplicity and structure of derivations. Conditions L1--L3 concern something else: which derivations a ground \emph{may not} share with the coordinates it is meant to ground, and whether shared ancestry has been disclosed. That is a property of a declared derivation graph relative to a claim, not an annotation of a query result. The two are complementary: an algebraic provenance computation could supply the lineage record that our checker (\cref{sec:lineage}) then judges. We do not provide algebraic propagation.
+
+\paragraph{W3C PROV}
+PROV-DM \cite{prov2013} standardises descriptive provenance: entities, activities and agents, and relations such as derivation and attribution. It records what is asserted to have happened, and deliberately does not say when a record licenses a claim. Our lineage record is comparable to a derivation graph, but grounded transport adds checkable conditions on it (independence of the ground, disclosure of shared ancestry, a claim-relevant source), declared coverage with gaps, and an assessment that keeps missing evidence distinct from counterevidence. A mapping from PROV documents to lineage records is future work and would be a way to obtain the records our checker consumes.
+
+\paragraph{Proof-carrying code and certified transformation.}
+Proof-carrying code \cite{necula1997} ships code with a machine-checkable proof; verified compilers \cite{leroy2009} prove semantic preservation once and for all; translation validation \cite{pnueli1998} checks each compilation run instead. All carry or check evidence that a transformation preserves semantics or safety. Grounded transport carries evidence about a different question: whether an agreement between representations is independently grounded, how it was produced, over what coverage, and with which obligations unresolved. Its per-problem certificate is closest in spirit to translation validation (a per-instance check) but its assessments admit a third outcome, $\Open$, for obligations that no available procedure decides.
+
+\paragraph{Rewriting logic, transition systems, categories.}
+Rewriting logic \cite{meseguer1992} and labelled transition systems retain transition labels; a label alone need not contain checkable lineage, coverage and warrant evidence, and grounded witnesses can be read as richly certified labels, a reading we do not develop. The categorical structure of witnesses \cite{maclane1998} is the one described above, up to $\weq$.
+
+\paragraph{Factorisation, assurance.}
+The obstruction results build on the standard criterion that a predicate factors through an observation exactly when it is constant on its fibres, in the manner of the exactness condition of abstract interpretation \cite{cousot1977}; we use it as an established tool. The certified/refuted/open distinction supports assurance arguments that must retain defeaters and unresolved obligations rather than issue only success or failure \cite{bloomfield2020}.
+
+\begin{table}[t]
+\centering\small
+\caption{What each neighbour retains, and what grounded transport adds.}\label{tab:related}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Neighbour & Retains & Grounded transport adds (or refuses to erase) \\
+\midrule
+Generalised rewriting & relation, \texttt{Proper} instances (as propositions) & type-valued witnesses; witness-mapping contexts; directedness \\
+Proof-relevant logical relations & semantic witnesses of relatedness & externally declared process evidence; failure and open states; extraction \\
+Groupoid model & non-unique identity proofs & which extractable data distinguish witnesses; two-stage erasure \\
+Provenance semirings & multiplicity and structure of derivations & claim-relative independence conditions L1--L3; coverage \\
+W3C PROV & descriptive derivation records & checkable conditions on such records; assessment \\
+PCC, verified compilation, translation validation & semantic-preservation evidence & grounding, lineage, authority; an $\Open$ outcome \\
+\bottomrule
+\end{tabularx}
+\end{table}

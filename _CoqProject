@@ -1,0 +1,40 @@
+-R legacy/exactness-2026 Exactness
+-R theories GTC
+-R examples GTCExamples
+
+legacy/exactness-2026/Admissibility.v
+legacy/exactness-2026/GroundedSeam.v
+theories/Core/GroundedTransport.v
+theories/Core/Erasure.v
+theories/Core/Composition.v
+theories/Contexts/GroundedProper.v
+theories/Contexts/ContextualPreservation.v
+theories/Obstructions/FibreObstruction.v
+theories/Obstructions/ClassicalFactorisation.v
+theories/Obstructions/LineageObstruction.v
+theories/Obstructions/UngroundedAgreement.v
+theories/Debt/WarrantDebt.v
+theories/Debt/DebtClassifier.v
+theories/Debt/OriginalObligations.v
+theories/Debt/Certificates.v
+theories/Debt/LineageCheck.v
+theories/Debt/Assessment.v
+theories/Debt/MaintenanceDebt.v
+theories/Debt/EvidenceObligations.v
+theories/Debt/GroundedWitness.v
+theories/Debt/TransportAssessment.v
+theories/Debt/LineageAssessment.v
+theories/Debt/PackedWarrant.v
+theories/Debt/CertificateProper.v
+theories/Instances/ExtensionalSeam.v
+theories/Instances/OriginalGroundedSeamInstance.v
+theories/Instances/OriginalAdmissibility.v
+theories/Instances/OriginalDynamicSeamInstance.v
+examples/LineageCertificates.v
+examples/LineageChecked.v
+examples/CopiedCoordinates.v
+examples/EvolutionCoverage.v
+examples/DifferentWarrants.v
+examples/SeamTransport.v
+examples/MaintenanceFailure.v
+examples/CertificateReissue.v

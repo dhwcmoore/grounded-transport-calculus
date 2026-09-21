@@ -1,0 +1,38 @@
+# make check transcript
+# The Coq Proof Assistant, version 8.18.0
+# OCaml 4.14.1
+# Linux x86_64
+
+coqc Admissibility.v
+Closed under the global context
+Closed under the global context
+coqc -Q . Exactness GroundedSeam.v
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+coqc -Q . Exactness SeamExtraction.v
+ocamlc -o examples admissibility.ml examples.ml
+./examples > examples_output.current.txt
+cmp examples_output.txt examples_output.current.txt
+ocamlc -o jurisdiction admissibility.ml jurisdiction.ml
+./jurisdiction > jurisdiction_output.current.txt
+cmp jurisdiction_output.txt jurisdiction_output.current.txt
+ocamlc -c seam_checks.mli
+ocamlc -c seam_checks.ml
+ocamlc -c certified_temporal_seam.mli
+ocamlc -c certified_temporal_seam.ml
+ocamlc -o interface_ok seam_checks.cmo certified_temporal_seam.cmo interface_ok.ml
+./interface_ok > interface_ok.current.txt
+grep -q "non-commuting evolution rejected at element 0" interface_ok.current.txt
+grep -q "grounded candidate certified" interface_ok.current.txt
+grep -q "rejected at request 1" interface_ok.current.txt
+direct construction rejected
+stage mismatch rejected
+ocamlc -o interface_unsafe_cast seam_checks.cmo certified_temporal_seam.cmo interface_unsafe_cast.ml
+./interface_unsafe_cast | grep -q "unsafe cast compiled"
+exit status: 0

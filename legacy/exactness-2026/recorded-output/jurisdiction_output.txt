@@ -1,0 +1,33 @@
+|S| = 864, |rates| = 9, zones = 20, municipalities = 10
+phi holds on 96 states; phi_old holds on 96; they differ on 36
+   of which split-zone (secondary municipality): 28; stale-table (primary municipality 3 or 7, general, after): 8; other: 0
+   stale-table states in single-municipality zones: 4
+--- static ---
+phi on M_t = (zone,g,e,r)          fibres= 720 mixed= 28  Inadmissible; witness (z=2,m=2,general,before,r=60) / (z=2,m=5,general,before,r=60)
+phi_old on M_t                     fibres= 720 mixed=  0  Admissible; factor table 720 entries, verified
+phi on M_t+1 = (m,g,e,r)           fibres= 360 mixed=  0  Admissible; factor table 360 entries, verified
+phi on M_t, unsplit zones, sample  fibres= 576 mixed=  0  NoWitnessFound
+kernel of <M_t, phi>: 748 blocks; M_t+1: 360 blocks
+--- seam, as migrated (backfill derives municipality from zone) ---
+carrier=1728  seam_witnesses=48  grounding_witnesses=74  agree_but_ungrounded=26  B_departs=28
+   live     seam= 36 grounding= 36 agree_but_ungrounded=  0 B_departs=  0 A_departs= 36
+   backfill seam= 12 grounding= 38 agree_but_ungrounded= 26 B_departs= 28 A_departs= 36
+   first agree_but_ungrounded: (z=2,m=5,general,before,r=60)[backfill]  A=true B=true Sigma=false
+   agree-false-but-true example: (z=2,m=5,general,before,r=70)[backfill]  A=false B=false Sigma=true
+--- seam, repaired (backfill re-geocodes retained address text) ---
+carrier=1728  seam_witnesses=72  grounding_witnesses=72  agree_but_ungrounded=0  B_departs=0
+   live     seam= 36 grounding= 36 agree_but_ungrounded=  0 B_departs=  0 A_departs= 36
+   backfill seam= 36 grounding= 36 agree_but_ungrounded=  0 B_departs=  0 A_departs= 36
+   no agree_but_ungrounded element
+--- translation ---
+whole carrier                      no translation; witness (z=18,m=8,general,before,r=20)[live] -> m_new=8 / (z=18,m=1,general,before,r=20)[live] -> m_new=1
+backfill rows only                 translation exists on declared subset (|D|=864)
+live rows only                     no translation; witness (z=18,m=8,general,before,r=20)[live] -> m_new=8 / (z=18,m=1,general,before,r=20)[live] -> m_new=1
+--- exhibition condition (iii) ---
+record without delivery scan: phi_sigma not determined; witness (z=2,m=2,general,before,r=60)[backfill] / (z=2,m=5,general,before,r=60)[backfill]
+--- lineage audit ---
+live rows                    L1 pass; L2 pass shared=[]; L3 pass ground-only=[carrier_scan; delivery_event; m_delivered] claim-relevant raw=[delivery_event]; lineage-grounded=true
+backfill rows                L1 pass; L2 pass shared=[zone:open-defeater]; L3 pass ground-only=[carrier_scan; delivery_event; m_delivered] claim-relevant raw=[delivery_event]; lineage-grounded=true
+backfill, zone undisclosed   L1 pass; L2 FAIL shared=[zone:UNDISCLOSED]; L3 pass ground-only=[carrier_scan; delivery_event; m_delivered] claim-relevant raw=[delivery_event]; lineage-grounded=false
+copied seam valuation        L1 FAIL; L2 pass shared=[zone:open-defeater]; L3 FAIL ground-only=[] claim-relevant raw=[]; lineage-grounded=false
+cyclic record                MalformedLineage: cycle through zone

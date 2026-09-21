@@ -1,0 +1,124 @@
+\section{Evidential erasure}\label{sec:erasure}
+
+\subsection{Two-stage erasure}
+Erasure forgets in two stages, and both are lossy (\cref{fig:erasure}).
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=9mm and 26mm, box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small,text width=2.7cm}, lab/.style={align=center,font=\scriptsize}, >=Stealth]
+\node[box] (G) {Grounded witness\\ certificates $+$ crossings};
+\node[box,right=of G] (C) {Crossing witness};
+\node[box,right=of C] (R) {Ordinary relation $R(x,y)$};
+\node[box,below=of G] (S) {Evidence summary (extractable data)};
+\draw[->] (G) -- node[above,lab]{$\erase_1$\\ drop certificates} (C);
+\draw[->] (C) -- node[above,lab]{$\erase_2$\\ drop crossing} (R);
+\draw[->] (G) -- (S);
+\draw[->,dashed,bend left=22] (R.south) to node[below,lab]{cannot reconstruct} (G.south east);
+\end{tikzpicture}
+\caption{Two-stage erasure. The dashed arrow marks what erasure loses irreversibly (\cref{thm:nonreflect,thm:multiplicity}). The evidence summary is a separate, lossy projection that keeps extractable identifiers.}
+\label{fig:erasure}
+\end{figure}
+
+\paragraph{First erasure.}
+$\erase_1 : \GTrans_c(s,t) \to \Cross_c(s,t)$ maps $\mathsf{step}(r,\kappa)$ to the crossing $\mathsf{step}(r)$ justified by the grounding equations contained in $\kappa$, and is the identity on $\mathsf{id}$ and $\cdot$ (\coq{rpath_forget}). It forgets the lineage graph, coverage and gaps, custodian, authority evidence, maintenance evidence, and the identity of the certificate; it keeps the directed path and the seam elements crossed.
+
+\paragraph{Second erasure.}
+$\erase_2 : \Cross_c(s,t) \to R_c(s,t)$ maps a crossing path to agreement $\val(s) = \val(t)$ (\cref{thm:soundness}). It forgets which crossing was used, whether there was more than one, and the internal structure of the transition. The composite $\erase = \erase_2 \circ \erase_1$ is ordinary substitutability. Both stages preserve identity and composition.
+
+\begin{table}[t]
+\centering\small
+\caption{Grounded versus ordinary rewriting.}\label{tab:compare}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+ & Ordinary rewriting & Grounded transport \\
+\midrule
+Judgement & $R(x,y) : \Prop$ & $\GTrans_c(x,y) : \Type$ \\
+Inhabitants & indistinguishable proofs & distinguishable witnesses \\
+Seam, lineage, coverage & not retained & retained as data \\
+Contexts & $\Proper$: preserves the relation & crossing-proper / certificate-proper: map witnesses \\
+Failure & absence of proof & located obstruction, or open obligation \\
+Relation to the other & --- & erases to it; not conversely \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Erasure soundness}
+\begin{thm}[Erasure soundness]\label{thm:soundness}
+If $w : \GTrans_c(s,t)$ then $\val(s) = \val(t)$. \emph{(Coq: \coq{erase_sound}, \coq{rpath_sound}; generically \coq{erasure_sound}.)}
+\end{thm}
+\begin{proof}
+By induction on $w$, through $\erase_1$. If $w = \mathsf{id}_s$, reflexivity. If $w = \mathsf{step}(r,\kappa)$, the construction certificate in $\kappa$ contains the grounding equations at $r$, so
+\[
+\val(\mathsf{inl}\,\back(r)) = \Phi_A(\back(r)) = \Phi_\Sigma(r) = \Phi_B(\fwd(r)) = \val(\mathsf{inr}\,\fwd(r)).
+\]
+If $w = v \cdot v'$, combine the hypotheses for $v$ and $v'$ by transitivity.
+\end{proof}
+For a generic transport structure $G$ for $R$ write $\erased_G(x,y) :\equiv \|\GTrans_G(x,y)\|$.
+\begin{prop}[Erased preorder]\label{prop:preorder}
+$\erased_G$ is reflexive and transitive, and contained in $R$. \emph{(Coq: \coq{erased_PreOrder}, \coq{erasure_sound}.)}
+\end{prop}
+\begin{proof}
+Reflexivity from $\mathsf{id}$, transitivity from composition, containment from the soundness map of $G$.
+\end{proof}
+Since composition is associative only up to $\weq$ (\cref{thm:algebra}) but $\erased_G$ records only inhabitation, the erased relation satisfies the ordinary preorder laws with no qualification.
+
+\subsection{Sound refinement, not universal reconstruction}
+Two formulations must be distinguished. If the relation is \emph{defined} by the existence of a grounded witness, $R_G(x,y) :\Longleftrightarrow \exists w : \GTrans_G(x,y)$, then erasure characterises $R_G$ exactly, by definition. If instead $R$ is independently given, the general theorem is only the soundness map $\GTrans_G(x,y) \to R(x,y)$. A converse requires a completeness (representability) hypothesis.
+\begin{prop}[Exact recovery under completeness]\label{prop:complete}
+Call $G$ \emph{complete} if $R(x,y) \Rightarrow \erased_G(x,y)$ for all $x,y$. Then $R$ and $\erased_G$ coincide. Completeness holds for the trivial structure whose witnesses are the proofs $R(x,y)$ themselves (for a preorder $R$), and is refuted by any $R$-related pair without a witness. \emph{(Coq: \coq{erasure_exact_of_complete}, \coq{preorder_complete}, \coq{not_complete_of_gap}.)}
+\end{prop}
+It fails in exactly the cases of interest (\cref{thm:nonreflect}). We therefore call the generic result a \emph{sound refinement}, not an equivalence with all ordinary rewriting, and we do not say that grounded transport ``recovers'' all ordinary rewriting.
+
+\subsection{Non-reflection}
+\begin{thm}[Erasure does not reflect grounding]\label{thm:nonreflect}
+There exist a transport problem $c$ and states $s,t$ with $\val(s) = \val(t)$ and $\neg\,\erased_{\GTrans_c}(s,t)$. \emph{(Coq: \coq{erasure_not_reflecting}, \coq{copied_ungrounded_agreement}.)}
+\end{thm}
+\begin{proof}
+Let $c_{\mathrm{dw}}$ be the dual-write problem of \cref{sec:example}: $\Sigma = A = B = \{r_{\mathrm{ok}}, r_*\}$, $\back = \fwd = \mathrm{id}$, $\Phi_A = \Phi_B \equiv 1$, $\Phi_\Sigma(r_{\mathrm{ok}}) = 1$, $\Phi_\Sigma(r_*) = 0$, with maintenance and authority evidence trivially inhabited by a one-point type, constant observation maps (so both coordinates are admissible), and the declared lineage record $\ell$ with nodes $0$ (raw status), $1 = d_A$ with parent $0$, $2 = d_B$ with parent $1$, and ground node $3 = g$ with parent $1$. Thus the ground is derived from $d_A$.
+
+\emph{Step 1: $\mathsf{Cert}(c_{\mathrm{dw}}) = \emptyset$.} Suppose $\kappa \in \mathsf{Cert}(c_{\mathrm{dw}})$. Its construction certificate contains a lineage certificate $\lambda$ with graph $\ell$ and a proof of L1 for $\ell$, so $d_A = 1 \notin \anc_\ell(3)$. But $1 \in \mathsf{parents}_\ell(3)$, so $1 \in \anc_\ell(3)$, a contradiction. (Independently, the grounding equation at $r_*$ would require $\Phi_A(r_*) = 1 = 0 = \Phi_\Sigma(r_*)$.)
+
+\emph{Step 2: every $w \in \GTrans_{c_{\mathrm{dw}}}(s,t)$ has $s = t$.} By induction on $w$: identity is trivial; a $\mathsf{step}$ would contain a certified transport, impossible by Step 1; and if $s = s'$ and $s' = t$ then $s = t$.
+
+\emph{Step 3.} Take $s = \mathsf{inl}\,r_*$ and $t = \mathsf{inr}\,r_*$. Then $\val(s) = \Phi_A(r_*) = 1 = \Phi_B(r_*) = \val(t)$, but $s \neq t$ (different summands). By Step 2 there is no witness, so $\erased(s,t)$ fails.
+\end{proof}
+The same fact is a generic \emph{ungrounded agreement}: extensional agreement without a transport witness, whose existence refutes completeness and hence exact recovery.
+
+\subsection{Same endpoints, different warrants}\label{sec:multiplicity}
+Non-reflection shows that erasure has no inverse. A stronger result gives two \emph{positive} witnesses for the same endpoints whose evidential difference is observable before erasure. Witnesses for different problems have different indexed types, so we package the problem with the witness.
+\begin{defi}[Packed warrants]\label{def:packed}
+Fix an endpoint type $E$ and, for each problem $c$, an interpretation $\mathsf{emb}_c : S_c \to E$. Then
+\[
+\mathsf{PackedWarrant}(x,y) \;:\equiv\; \sum_{c}\ \sum_{s,t : S_c} \bigl(\mathsf{emb}_c(s) = x\bigr) \times \bigl(\mathsf{emb}_c(t) = y\bigr) \times \GTrans_c(s,t),
+\]
+and $\mathsf{ErasedAt}(x,y) :\equiv \exists c, s, t.\ \mathsf{emb}_c(s) = x \wedge \mathsf{emb}_c(t) = y \wedge \erased_{\GTrans_c}(s,t)$. Erasure of a packed warrant lands in $\mathsf{ErasedAt}(x,y)$. The \emph{extractable summary} $\mathsf{summary}(w)$ of a witness is the list, over its crossings, of: exhibition record identifier, custodian, lineage ground node, coverage interval, number of declared lineage dispositions, and the maintenance and authority summaries supplied by the application's evidence-summary interface (\cref{sec:mechanisation}).
+\end{defi}
+This places warrants from problems with \emph{different} declared lineage into one endpoint-indexed collection, without pretending their lineage records coincide. (Coq: \coq{PackedWarrant}, \coq{erase_packed}, \coq{warrant_summary}.)
+
+\begin{thm}[Same endpoints, different warrants]\label{thm:multiplicity}
+There exist $w_1, w_2 \in \mathsf{PackedWarrant}(x,y)$ for the same endpoints such that both erase into $\mathsf{ErasedAt}(x,y)$, while $\mathsf{summary}(w_1) \neq \mathsf{summary}(w_2)$, and hence $w_1 \neq w_2$. Within a single problem, two witnesses in $\GTrans_c(s,t)$ have different summaries. \emph{(Coq: \coq{packed_warrants_same_endpoints}, \coq{same_endpoints_different_warrants}, \coq{packed_distinguishable}.)}
+\end{thm}
+\begin{proof}
+Let $E = \bool$, with $\mathsf{emb}_c$ sending $A$-side states to $0$ and $B$-side states to $1$. For a list $d$ of lineage dispositions let $c_d$ be the problem with $A = B = \{\ast\}$, $\Sigma = \{0,1\}$ (two seam elements), all valuations constantly $1$, trivial observation maps, maintenance evidence a point, authority evidence a record $(\text{authority identifier})$, and declared lineage the record $\ell_d$: raw nodes $0,1,2$; $d_A = 3$ with parent $0$; $d_B = 4$ with parent $1$; ground $5$ with parent $2$; $\{2\}$ the claim-relevant inputs; dispositions $d$. The graph $\ell_d$ is well-formed and satisfies L1--L3: the ancestors of $3$, $4$, $5$ are $\{0\}$, $\{1\}$, $\{2\}$ respectively, so the ground descends from neither coordinate, there are no shared non-raw ancestors, and $2$ is a claim-relevant raw input among the ground-only ancestors. Hence for every choice of record identifier $\rho$, custodian $\varsigma$, authority $\alpha$ and coverage $\gamma$ we obtain a certified transport $\kappa(d,\rho,\varsigma,\alpha,\gamma) \in \mathsf{Cert}(c_d)$: admissibility from the constant factor, the grounding equations hold as all valuations are $1$, and the exhibition certificate is $(\rho, \iota, \text{process}, \mathrm{Ret} = \bool, \mathsf{retain} = \Phi_\Sigma, \mathsf{eval} = \mathrm{id}, \gamma, \varsigma)$ with $\iota$ injective.
+
+Let $d_0 = [\,]$ and $d_1 = [(9,\mathsf{Justified})]$, and put
+\begin{align*}
+w_1 &= \mathsf{step}(0, \kappa(d_0, 1, 7, 11, (0,1))) && \in \GTrans_{c_{d_0}}(\mathsf{inl}\,\ast, \mathsf{inr}\,\ast),\\
+w_2 &= \mathsf{step}(1, \kappa(d_0, 2, 8, 12, (0,5))) && \in \GTrans_{c_{d_0}}(\mathsf{inl}\,\ast, \mathsf{inr}\,\ast),\\
+w_3 &= \mathsf{step}(0, \kappa(d_1, 1, 7, 11, (0,1))) && \in \GTrans_{c_{d_1}}(\mathsf{inl}\,\ast, \mathsf{inr}\,\ast).
+\end{align*}
+All have endpoints $(0,1)$ under $\mathsf{emb}$, so pack to elements of $\mathsf{PackedWarrant}(0,1)$, and all erase into $\mathsf{ErasedAt}(0,1)$ by $\erase$. Their summaries list, for $w_1,w_2,w_3$ respectively: record identifiers $1,2,1$; custodians $7,8,7$; coverage intervals $(0,1),(0,5),(0,1)$; authorities $11,12,11$; and $0,0,1$ declared lineage dispositions (all with ground node $5$). These differ pairwise: $w_1,w_2$ in record, custodian, coverage and authority; $w_1,w_3$ in the number of lineage dispositions. Since equal witnesses have equal summaries, $w_i \neq w_j$ for $i \neq j$.
+\end{proof}
+We do not assert equality of the two erased \emph{proofs}: $\mathsf{ErasedAt}$ is a proposition, so equality of its proofs would require proof irrelevance and would be uninformative. The content is that erasure sends both witnesses into a single proposition that records nothing about which was used, while the summary separates them. The witnesses differ in seam element, exhibition record, custodian, coverage interval, authority, and, across problems, in the declared lineage. This is the most direct proof that ordinary rewriting forgets evidential structure.
+
+\subsection{Observational agreement is not a warrant}\label{sec:obstruction}
+Non-reflection concerns the relation induced by transport. A related question is whether an \emph{observational} equivalence can license substitution for a predicate that depends on lineage. Let $M : X \to O$ be an observation map, $x \sim_M y :\Leftrightarrow M(x) = M(y)$, and $P : X \to V$ a predicate. Recall that $P$ \emph{factors through} $M$ iff $P = h \circ M$ for some $h$, which holds iff $P$ is constant on the fibres of $M$; this is the standard factorisation criterion \cite{cousot1977}.
+\begin{prop}[Observational agreement cannot license lineage-sensitive substitution]\label{prop:obsobstruction}
+Suppose $x \sim_M y$ and $P(x) \neq P(y)$. Then
+(a) $P$ does not factor through $M$, and $P$ is not proper for $(\sim_M, =)$;
+(b) if $G$ is a transport structure for the relation $R_P(a,b) :\equiv P(a) = P(b)$, then $\GTrans_G(x,y)$ is empty.
+Consequently no transport structure sound for $R_P$ is complete for $\sim_M$. \emph{(Coq: \coq{fibre_obstruction}, \coq{not_proper_of_distinguished}, \coq{observational_not_grounded}, \coq{obs_equiv_not_transport}.)}
+\end{prop}
+\begin{proof}
+(a) If $P = h \circ M$ then $P(x) = h(M(x)) = h(M(y)) = P(y)$, contradicting $P(x) \neq P(y)$; and properness would give $P(x) = P(y)$ from $x \sim_M y$. (b) A witness $w \in \GTrans_G(x,y)$ would give $R_P(x,y)$ by soundness, that is $P(x) = P(y)$. The last claim follows since completeness for $\sim_M$ would give $\GTrans_G(x,y)$ from $x \sim_M y$.
+\end{proof}
+In the dual-write example take $M$ to be the copied coordinate value (constant $1$) and $P(\mathsf{inl}\,r) = \Phi_\Sigma(r)$, the exhibited trace status: $P(\mathsf{inl}\,r_{\mathrm{ok}}) = 1 \neq 0 = P(\mathsf{inl}\,r_*)$, although $M$ identifies them. So the trace status is not determined by the copied value (\coq{trace_not_determined_by_copied_value}). The direction from factorisation to fibre-constancy and its relational converse are constructive; the finite converse needs a complete enumeration and decidable equality; the unrestricted functional converse needs classical choice and is isolated (\cref{sec:mechanisation}).

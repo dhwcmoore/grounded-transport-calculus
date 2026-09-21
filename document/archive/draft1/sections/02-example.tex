@@ -1,0 +1,37 @@
+\section{A minimal failure of extensional warrant}\label{sec:example}
+
+This section presents the motivating counterexample in full, before any general definitions. It is the model reused in \cref{sec:erasure,sec:seams,sec:evaluation}.
+
+\subsection{The dual-write span}
+Let $\Sigma = \{r_{\mathrm{ok}}, r_*\}$ be a set of requests and take $A = B = \Sigma$, with projections
+\[
+A \xleftarrow{\ \back\ } \Sigma \xrightarrow{\ \fwd\ } B, \qquad \back = \fwd = \mathrm{id}.
+\]
+Let both coordinate predicates be constantly true:
+\[
+\Phi_A(\back(r)) = 1, \qquad \Phi_B(\fwd(r)) = 1 \qquad (r \in \Sigma).
+\]
+Then $\Phi_A \circ \back = \Phi_B \circ \fwd$: pairwise, extensional seam coherence holds.
+
+\subsection{The independently grounded valuation}
+Let the seam carry its own valuation, exhibited from the execution trace:
+\[
+\Phi_\Sigma(r_{\mathrm{ok}}) = 1, \qquad \Phi_\Sigma(r_*) = 0.
+\]
+At $r_*$ we have $\Phi_A(\back(r_*)) = \Phi_B(\fwd(r_*)) = 1$ but $\Phi_\Sigma(r_*) = 0$: the coordinates agree with each other while disagreeing with the exhibited process.
+
+\subsection{The copied alternative}
+Defining instead $\widetilde{\Phi}_\Sigma = \Phi_A \circ \back$ satisfies all three equations. But its lineage descends from the very coordinate it is supposed to ground, so it fails the lineage requirement (\cref{sec:lineage}). Three things are thereby separated: equational agreement, independent grounding, and lineage warrant.
+
+\subsection{Requirements extracted from the example}
+\begin{enumerate}
+\item Transport must retain an \emph{exhibited crossing} (a seam element).
+\item Grounding must refer to an \emph{independent seam valuation}, not merely to the agreement of the two coordinates.
+\item Lineage must be \emph{data}, not an erased proposition.
+\item Ordinary agreement must be \emph{obtainable by erasure}.
+\item Failure must report \emph{why} grounding was unavailable.
+\end{enumerate}
+The question the calculus answers is therefore:
+\begin{quote}
+\emph{What structure must be retained so that the copied and independently grounded transports do not collapse into the same formal object?}
+\end{quote}

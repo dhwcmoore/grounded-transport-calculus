@@ -1,0 +1,37 @@
+# Coq / dune build products
+*.vo
+*.vok
+*.vos
+*.glob
+.*.aux
+.lia.cache
+Makefile.coq
+Makefile.coq.conf
+.Makefile.coq.d
+_build/
+
+# LaTeX build products (paper.pdf is kept as the built draft)
+document/*.aux
+document/*.log
+document/*.out
+document/*.fls
+document/*.fdb_latexmk
+document/*.blg
+document/*.bbl
+document/*.toc
+
+# regenerable packages
+document/review-bundle.zip
+document/arxiv-source.tar.gz
+document/arxiv-src/
+document/arxiv-test/
+
+# extraction / regression scratch outputs
+*.cmi
+*.cmo
+*.cmx
+*.o
+lineage_check_extracted.ml
+lineage_check_extracted.mli
+assessment_extracted.ml
+assessment_extracted.mli
