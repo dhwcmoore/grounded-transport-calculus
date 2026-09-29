@@ -41,7 +41,8 @@ suite detects each. Both are tests, not theorems.
 The handwritten audit predates the v6 conditions, so the random comparison uses
 only records in the legacy overlap (`legacy_overlap` in `lineage_regression.ml`):
 the ground differs from both coordinates and is not a purely raw node. On these
-records the v6 and earlier conditions coincide. Records outside it are skipped,
+records, inspection of the definitions shows the v6-only clauses to be inactive;
+agreement there is regression evidence, not a proof of equivalence. Records outside it are skipped,
 not resampled (1079 of 3000 at the time of writing); the v6 clauses are tested by
 the edge cases instead.
 

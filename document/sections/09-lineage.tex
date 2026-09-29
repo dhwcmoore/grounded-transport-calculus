@@ -115,7 +115,7 @@ For a fixed lineage graph and fixed ground, L1 composes across consecutive coord
 
 To state this without a composition operator on lineage records, fix every field of a record $g$ except the coordinates, and write $g[a,b]$ for $g$ with $d_A := a$ and $d_B := b$. The graph, the raw and claim-relevant inputs, the dispositions and the ground $\gamma$ are then the same in $g[A,B]$, $g[B,C]$ and $g[A,C]$, and so is $\mathrm{Anc}_g$, which depends only on $D$.
 
-\begin{prop}[Fixed-ground composition of L1]\label{prop:l1compose}
+\begin{prop}[Fixed-graph, fixed-ground composition of L1]\label{prop:l1compose}
 For every record $g$ and nodes $A,B,C$: if $g[A,B]$ and $g[B,C]$ satisfy L1, then so does $g[A,C]$. \emph{(Coq: \coq{L1_at_composes}.)}
 \end{prop}
 \begin{proof}
