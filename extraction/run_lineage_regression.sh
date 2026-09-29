@@ -13,4 +13,11 @@ cp "$LEG/admissibility.ml" "$LEG/jurisdiction.ml" "$ROOT/extraction/lineage_regr
 ocamlfind ocamlc -package unix -linkpkg -w -a \
   lineage_check_extracted.mli lineage_check_extracted.ml \
   admissibility.ml jurisdiction.ml lineage_regression.ml -o regression
-./regression | sed -n '/=== extracted/,$p'
+if ./regression > regression.out 2>&1; then
+  status=0
+else
+  status=$?
+fi
+
+sed -n '/=== extracted/,$p' regression.out
+exit "$status"

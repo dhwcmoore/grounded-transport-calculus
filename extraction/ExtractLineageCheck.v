@@ -15,4 +15,5 @@ From GTC.Debt Require Import Certificates LineageCheck.
 Extraction Language OCaml.
 Extraction "lineage_check_extracted.ml"
   lineage_check lineage_defect issue_certificate wf_defect
-  descends_a descends_b undisclosed check_L3 ancestors.
+  ground_eq_a ground_eq_b descends_a descends_b check_L1
+  distinguished_b undisclosed check_L3 ancestors.

@@ -52,7 +52,7 @@ let extracted (l : J.lineage) : verdict =
   | Some C.RelevantNotRaw -> Malformed "relevant"
   | Some (C.Cycle _) -> Malformed "cycle"
   | None ->
-      let l1 = not (C.descends_a g) && not (C.descends_b g) in
+      let l1 = C.check_L1 g in
       let l2 = (C.undisclosed g = None) in
       let l3 = C.check_L3 g in
       let grounded = (C.lineage_defect g = None) in
@@ -92,6 +92,28 @@ let handwritten (l : J.lineage) : verdict =
   let line = input_line ic in
   close_in ic; Sys.remove tmp;
   parse_line line
+
+(* The handwritten audit implements the pre-v6 specification.
+   Differential comparison is authoritative only where that specification and
+   v6 have the same semantics.
+
+   They intentionally diverge when:
+   - ground = d_A or ground = d_B; or
+   - ground is a directly raw, non-derived node.
+
+   Outside this domain we test the v6 checker against explicit v6 expectations,
+   not against the frozen handwritten audit. *)
+let is_derived_name (l : J.lineage) n =
+  List.exists (fun (m, _) -> m = n) l.J.derived
+
+let is_raw_name (l : J.lineage) n =
+  List.mem n l.J.raw
+
+let legacy_overlap (l : J.lineage) =
+  l.J.ground <> l.J.d_a &&
+  l.J.ground <> l.J.d_b &&
+  not (is_raw_name l l.J.ground &&
+       not (is_derived_name l l.J.ground))
 
 (* ---- 1. the five case-study records ---- *)
 let () =
@@ -141,19 +163,37 @@ let () =
         else None) der in
     { J.derived = derived; raw; claim_relevant = relevant;
       d_a = pd (); d_b = pd (); ground = pd (); dispositions } in
-  let n = 3000 and bad = ref 0 and counts = Hashtbl.create 8 in
+  let n = 3000
+  and compared = ref 0
+  and skipped = ref 0
+  and bad = ref 0
+  and counts = Hashtbl.create 8 in
   for _ = 1 to n do
     let l = gen () in
-    let e = extracted l and h = handwritten l in
-    let key = match e with Malformed k -> "malformed:" ^ k
-                         | Flags (_, _, _, g) -> if g then "grounded" else "not-grounded" in
-    Hashtbl.replace counts key (1 + try Hashtbl.find counts key with Not_found -> 0);
-    if e <> h then begin
-      incr bad;
-      if !bad <= 5 then Printf.printf "DISAGREE: extracted %s, handwritten %s\n" (show e) (show h)
-    end
+    if legacy_overlap l then begin
+      incr compared;
+      let e = extracted l and h = handwritten l in
+      let key =
+        match e with
+        | Malformed k -> "malformed:" ^ k
+        | Flags (_, _, _, g) ->
+            if g then "grounded" else "not-grounded"
+      in
+      Hashtbl.replace counts key
+        (1 + try Hashtbl.find counts key with Not_found -> 0);
+      if e <> h then begin
+        incr bad;
+        if !bad <= 5 then
+          Printf.printf
+            "DISAGREE: extracted %s, handwritten %s\n"
+            (show e) (show h)
+      end
+    end else
+      incr skipped
   done;
-  Printf.printf "random differential: %d/%d agree\n" (n - !bad) n;
+  Printf.printf
+    "random differential: %d/%d agree (legacy-overlap only; %d/%d skipped)\n"
+    (!compared - !bad) !compared !skipped n;
   Hashtbl.iter (fun k v -> Printf.printf "   %-24s %d\n" k v) counts;
   if !bad > 0 then failed := true
 
@@ -177,6 +217,89 @@ let intent_name = function
 
 let full_cov = { C.cov_from = 0; cov_to = 1; cov_gaps = [] }
 let gap_cov = { C.cov_from = 0; cov_to = 1; cov_gaps = [9] }
+
+(* ---- v6-only edge cases ----
+
+   These cases intentionally lie outside the domain in which the frozen
+   handwritten audit is authoritative.  They are tested against the v6
+   specification directly. *)
+
+let () =
+  let eq_a : J.lineage =
+    { J.derived = [("da", ["ra"]); ("db", ["rb"])];
+      raw = ["ra"; "rb"; "rg"];
+      claim_relevant = ["rg"];
+      d_a = "da"; d_b = "db"; ground = "da";
+      dispositions = [] }
+  in
+  let eq_b : J.lineage =
+    { J.derived = [("da", ["ra"]); ("db", ["rb"])];
+      raw = ["ra"; "rb"; "rg"];
+      claim_relevant = ["rg"];
+      d_a = "da"; d_b = "db"; ground = "db";
+      dispositions = [] }
+  in
+  let raw_ground : J.lineage =
+    { J.derived = [("da", ["ra"]); ("db", ["rb"])];
+      raw = ["ra"; "rb"; "rg"];
+      claim_relevant = ["rg"];
+      d_a = "da"; d_b = "db"; ground = "rg";
+      dispositions = [] }
+  in
+
+  let ga = to_coq eq_a
+  and gb = to_coq eq_b
+  and gr = to_coq raw_ground in
+
+  let checks =
+    [
+      ("ground=d_A rejected",
+       match C.lineage_check ga full_cov with
+       | C.LineageRejected C.GroundEqualsA -> true
+       | _ -> false);
+
+      ("ground=d_B rejected",
+       match C.lineage_check gb full_cov with
+       | C.LineageRejected C.GroundEqualsB -> true
+       | _ -> false);
+
+      ("raw ground accepted",
+       match C.lineage_check gr full_cov with
+       | C.LineageAccepted -> true
+       | _ -> false);
+
+      ("raw ground certificate issued",
+       match C.issue_certificate gr full_cov with
+       | Some _ -> true
+       | None -> false);
+
+      ("ground=d_A no certificate",
+       match C.issue_certificate ga full_cov with
+       | None -> true
+       | Some _ -> false);
+
+      ("ground=d_B no certificate",
+       match C.issue_certificate gb full_cov with
+       | None -> true
+       | Some _ -> false);
+    ]
+  in
+
+  let passed =
+    List.fold_left
+      (fun n (name, ok) ->
+         Printf.printf "v6 %-32s %s\n"
+           name (if ok then "PASS" else "FAIL");
+         if ok then n + 1 else n)
+      0 checks
+  in
+
+  Printf.printf "v6 edge cases: %d/%d pass\n"
+    passed (List.length checks);
+
+  if passed <> List.length checks then
+    failed := true
+
 
 (* Build an accepted graph; [shared] adds a disclosed shared non-raw ancestor.
    Nodes: raw rg (ground-only source), ra, rb, extras; derived ia, da, db, g,
@@ -247,7 +370,7 @@ let stratified () =
     | No_source -> let l = mk () in { l with J.claim_relevant = ["ra"] }
     | Dup -> let l = mk () in { l with J.derived = l.J.derived @ [List.hd l.J.derived] }
     | Undeclared -> add_parent (mk ()) "da" "ghost"
-    | Dist_not_derived -> let l = mk () in { l with J.ground = "rg" }
+    | Dist_not_derived -> let l = mk () in { l with J.ground = "ghost_ground" }
     | Rel_not_raw -> let l = mk () in { l with J.claim_relevant = "da" :: l.J.claim_relevant }
     | Cyclic -> add_parent (mk ()) "ia" "da" in
   let cov_of = function OpenGaps -> gap_cov | _ -> full_cov in
@@ -262,6 +385,7 @@ let stratified () =
     | C.LineageRejected (C.Malformed C.DistinguishedNotDerived) -> Some Dist_not_derived
     | C.LineageRejected (C.Malformed C.RelevantNotRaw) -> Some Rel_not_raw
     | C.LineageRejected (C.Malformed (C.Cycle _)) -> Some Cyclic
+    | C.LineageRejected (C.GroundEqualsA | C.GroundEqualsB) -> None
     | C.LineageRejected C.DescentFromA -> Some Descent_a
     | C.LineageRejected C.DescentFromB -> Some Descent_b
     | C.LineageRejected (C.UndisclosedShared _) -> Some Undisclosed

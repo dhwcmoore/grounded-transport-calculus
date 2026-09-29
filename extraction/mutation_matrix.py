@@ -40,6 +40,31 @@ MUTANTS = [
    lambda s: s.replace("iter g (length (lin_nodes g)) (seed g n)", "iter g 1 (seed g n)", 1)),
   ("M13 ancestors: two saturation steps only",
    lambda s: s.replace("iter g (length (lin_nodes g)) (seed g n)", "iter g 2 (seed g n)", 1)),
+  ("M14 omit ground != d_A (L1)",
+   lambda s: re.sub(
+       r"let ground_eq_a g =\n\s+\(=\) g\.lin_ground g\.lin_dA",
+       "let ground_eq_a _ =\n  false",
+       s,
+       count=1)),
+
+  ("M15 omit ground != d_B (L1)",
+   lambda s: re.sub(
+       r"let ground_eq_b g =\n\s+\(=\) g\.lin_ground g\.lin_dB",
+       "let ground_eq_b _ =\n  false",
+       s,
+       count=1)),
+
+  ("M16 exclude ground itself from L3 candidates",
+   lambda s: s.replace(
+       "existsb (source_pred g) (g.lin_ground :: (ancestors g g.lin_ground))",
+       "existsb (source_pred g) (ancestors g g.lin_ground)",
+       1)),
+
+  ("M17 require ground to be derived again (WF)",
+   lambda s: s.replace(
+       "(mem g.lin_ground (lin_nodes g))",
+       "(mem g.lin_ground (map fst g.lin_derived))",
+       1)),
 ]
 
 def run(name, mutate):
@@ -54,12 +79,21 @@ def run(name, mutate):
     if r.returncode: return name, "COMPILE ERROR: " + r.stderr[:200], None
     out = subprocess.run("./mut", shell=True, cwd=d, capture_output=True, text=True).stdout
     # which suites detect the mutant, and which populations
-    suites = {"fixed": False, "random": False, "shallow": False, "deep": False}
+    suites = {
+        "fixed": False,
+        "random": False,
+        "shallow": False,
+        "deep": False,
+        "v6": False,
+    }
     pops = []
     m1 = re.search(r"case study: (\d+)/(\d+) agree", out)
     if m1 and m1.group(1) != m1.group(2): suites["fixed"] = True
     m2 = re.search(r"random differential: (\d+)/(\d+) agree", out)
     if m2 and m2.group(1) != m2.group(2): suites["random"] = True
+    m_v6 = re.search(r"v6 edge cases: (\d+)/(\d+) pass", out)
+    if m_v6 and m_v6.group(1) != m_v6.group(2):
+        suites["v6"] = True
     for line in out.splitlines():
         m3 = re.match(r"(.+?)\s+n=\d+\s+intended-verdict (\d+)/(\d+)\s+handwritten-flags (\d+)/(\d+)", line)
         if m3 and (m3.group(2) != m3.group(3) or m3.group(4) != m3.group(5)):
@@ -69,13 +103,16 @@ def run(name, mutate):
 
 rows = [run(n, f) for n, f in MUTANTS]
 mark = lambda b: "x" if b else "."
-print("| mutant | fixed | random | shallow strat. | deep strat. |")
-print("|---|:-:|:-:|:-:|:-:|")
+print("| mutant | fixed | random | shallow strat. | deep strat. | v6 edge |")
+print("|---|:-:|:-:|:-:|:-:|:-:|")
 for n, v, info in rows:
     if info is None:
-        print(f"| {n} | {v} | | | |"); continue
+        print(f"| {n} | {v} | | | | |"); continue
     su, _ = info
-    print(f"| {n} | {mark(su['fixed'])} | {mark(su['random'])} | {mark(su['shallow'])} | {mark(su['deep'])} |")
+    print(
+        f"| {n} | {mark(su['fixed'])} | {mark(su['random'])} | "
+        f"{mark(su['shallow'])} | {mark(su['deep'])} | {mark(su['v6'])} |"
+    )
 print()
 ok = [(n, i[0]) for n, v, i in rows if i is not None]
 tot = len(rows)
@@ -87,6 +124,18 @@ print(f"detected by shallow-stratified alone: {cnt(lambda su: su['shallow'])}/{t
 print(f"detected by deep-stratified alone: {cnt(lambda su: su['deep'])}/{tot}")
 print(f"detected by random alone: {cnt(lambda su: su['random'])}/{tot}")
 print(f"detected by fixed case study alone: {cnt(lambda su: su['fixed'])}/{tot}")
+print(
+    f"detected by v6 edge suite alone: "
+    f"{cnt(lambda su: su['v6'])}/{tot}"
+)
+
+v6_only = [
+    n for n, su in ok
+    if su["v6"]
+    and not (su["fixed"] or su["random"] or su["shallow"] or su["deep"])
+]
+print("detected only by v6 edge suite:", v6_only)
+
 miss = [n for n, su in ok if not any(su.values())]
 notrun = [n for n, v, i in rows if i is None]
 if miss or notrun: print("NOT DETECTED:", miss, "NOT RUN:", notrun)

@@ -13,6 +13,72 @@ From GTCExamples Require Import LineageCertificates.
 Definition full_coverage : CoverageRecord := {| cov_from := 0; cov_to := 1; cov_gaps := [] |}.
 Definition gappy_coverage : CoverageRecord := {| cov_from := 0; cov_to := 1; cov_gaps := [9] |}.
 
+(** Version 6: the ground must differ from both coordinate nodes.
+    Equality is a distinct defect from strict descent. *)
+Definition ground_equals_a_lineage : Lineage :=
+  {| lin_derived := [(3, [0]); (4, [1])];
+     lin_raw := [0; 1];
+     lin_relevant := [];
+     lin_dA := 3;
+     lin_dB := 4;
+     lin_ground := 3;
+     lin_dispositions := [] |}.
+
+Example ground_equals_a_rejected :
+  lineage_check ground_equals_a_lineage full_coverage =
+    LineageRejected GroundEqualsA.
+Proof. vm_compute. reflexivity. Qed.
+
+Definition ground_equals_b_lineage : Lineage :=
+  {| lin_derived := [(3, [0]); (4, [1])];
+     lin_raw := [0; 1];
+     lin_relevant := [];
+     lin_dA := 3;
+     lin_dB := 4;
+     lin_ground := 4;
+     lin_dispositions := [] |}.
+
+Example ground_equals_b_rejected :
+  lineage_check ground_equals_b_lineage full_coverage =
+    LineageRejected GroundEqualsB.
+Proof. vm_compute. reflexivity. Qed.
+
+(** Version 6: the ground itself may be a directly raw,
+    claim-relevant independent source. *)
+Definition raw_ground_lineage : Lineage :=
+  {| lin_derived := [(3, [0]); (4, [1])];
+     lin_raw := [0; 1; 2];
+     lin_relevant := [2];
+     lin_dA := 3;
+     lin_dB := 4;
+     lin_ground := 2;
+     lin_dispositions := [] |}.
+
+Example raw_ground_accepted :
+  lineage_check raw_ground_lineage full_coverage = LineageAccepted.
+Proof. vm_compute. reflexivity. Qed.
+
+Example raw_ground_certificate_issued :
+  exists cert,
+    issue_certificate raw_ground_lineage full_coverage = Some cert /\
+    lc_graph cert = raw_ground_lineage /\
+    lc_coverage cert = full_coverage.
+Proof.
+  destruct (proj2 (issue_certificate_iff _ _) raw_ground_accepted)
+    as [cert H].
+  exists cert.
+  destruct (issue_certificate_data _ _ _ H) as [G C].
+  auto.
+Qed.
+
+Example no_certificate_when_ground_equals_a :
+  issue_certificate ground_equals_a_lineage full_coverage = None.
+Proof. vm_compute. reflexivity. Qed.
+
+Example no_certificate_when_ground_equals_b :
+  issue_certificate ground_equals_b_lineage full_coverage = None.
+Proof. vm_compute. reflexivity. Qed.
+
 Example independent_accepted :
   lineage_check (indep_lineage []) full_coverage = LineageAccepted.
 Proof. vm_compute. reflexivity. Qed.
