@@ -121,13 +121,18 @@ Qed.
 Definition LineageWellFormed (g : Lineage) : Prop :=
   NoDup (lin_nodes g) /\
   (forall n ps, In (n, ps) (lin_derived g) -> forall p, In p ps -> In p (lin_nodes g)) /\
-  (forall n, In n [lin_dA g; lin_dB g; lin_ground g] -> In n (map fst (lin_derived g))) /\
+  In (lin_dA g) (map fst (lin_derived g)) /\
+  In (lin_dB g) (map fst (lin_derived g)) /\
+  In (lin_ground g) (lin_nodes g) /\
   (forall n, lin_is_relevant g n -> lin_is_raw g n) /\
   (forall n, ~ Ancestor g n n).
 
-(** (L1) no descent *)
+(** (L1) no descent and no coordinate-ground identity *)
 Definition L1 (g : Lineage) : Prop :=
-  ~ Ancestor g (lin_ground g) (lin_dA g) /\ ~ Ancestor g (lin_ground g) (lin_dB g).
+  lin_ground g <> lin_dA g /\
+  lin_ground g <> lin_dB g /\
+  ~ Ancestor g (lin_ground g) (lin_dA g) /\
+  ~ Ancestor g (lin_ground g) (lin_dB g).
 
 (** (L2) disclosure of shared non-raw ancestry *)
 Definition L2 (g : Lineage) : Prop :=
@@ -136,9 +141,14 @@ Definition L2 (g : Lineage) : Prop :=
 
 (** (L3) independent source *)
 Definition L3 (g : Lineage) : Prop :=
-  exists n, lin_is_raw g n /\ lin_is_relevant g n /\ Ancestor g (lin_ground g) n /\
-            ~ Ancestor g (lin_dA g) n /\ ~ Ancestor g (lin_dB g) n /\
-            n <> lin_dA g /\ n <> lin_dB g.
+  exists n,
+    lin_is_raw g n /\
+    lin_is_relevant g n /\
+    (n = lin_ground g \/ Ancestor g (lin_ground g) n) /\
+    ~ Ancestor g (lin_dA g) n /\
+    ~ Ancestor g (lin_dB g) n /\
+    n <> lin_dA g /\
+    n <> lin_dB g.
 
 Definition LineagePasses (g : Lineage) : Prop :=
   LineageWellFormed g /\ L1 g /\ L2 g /\ L3 g.

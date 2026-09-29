@@ -248,6 +248,8 @@ Inductive WfDefect : Type :=
 
 Inductive LineageDefect : Type :=
 | Malformed (d : WfDefect)
+| GroundEqualsA
+| GroundEqualsB
 | DescentFromA
 | DescentFromB
 | UndisclosedShared (n : nat)
@@ -306,7 +308,9 @@ Section Checks.
   (** ** Well-formedness *)
 
   Definition distinguished_b : bool :=
-    forallb (fun n => mem n (map fst (lin_derived g))) [lin_dA g; lin_dB g; lin_ground g].
+    mem (lin_dA g) (map fst (lin_derived g)) &&
+    mem (lin_dB g) (map fst (lin_derived g)) &&
+    mem (lin_ground g) (lin_nodes g).
   Definition relevant_b : bool := forallb (fun n => mem n (lin_raw g)) (lin_relevant g).
   Definition cycle_at : option nat :=
     find (fun n => mem n (ancestors g n)) (lin_nodes g).
@@ -323,10 +327,12 @@ Section Checks.
     else Some DuplicateNode.
 
   Lemma distinguished_iff : distinguished_b = true <->
-    (forall n, In n [lin_dA g; lin_dB g; lin_ground g] -> In n (map fst (lin_derived g))).
+    In (lin_dA g) (map fst (lin_derived g)) /\
+    In (lin_dB g) (map fst (lin_derived g)) /\
+    In (lin_ground g) (lin_nodes g).
   Proof.
-    unfold distinguished_b. rewrite forallb_forall. split;
-      intros H n Hn; apply mem_iff; apply H; exact Hn.
+    unfold distinguished_b. rewrite !Bool.andb_true_iff, !mem_iff.
+    tauto.
   Qed.
 
   Lemma relevant_iff : relevant_b = true <->
@@ -347,9 +353,15 @@ Section Checks.
       destruct relevant_b eqn:Hr; [|discriminate].
       destruct cycle_at as [c|] eqn:Hc; [discriminate|].
       pose proof (proj1 declared_parents_iff Hdp) as Hdp2.
-      pose proof (proj1 distinguished_iff Hd) as Hd2.
+      destruct (proj1 distinguished_iff Hd) as (HdA & HdB & Hg).
       pose proof (proj1 relevant_iff Hr) as Hr2.
-      refine (conj Hnd (conj Hdp2 (conj Hd2 (conj Hr2 _)))).
+      unfold LineageWellFormed.
+      split; [exact Hnd |].
+      split; [exact Hdp2 |].
+      split; [exact HdA |].
+      split; [exact HdB |].
+      split; [exact Hg |].
+      split; [exact Hr2 |].
       intros x Hx.
       assert (Hin : In x (lin_nodes g))
         by (unfold lin_nodes; apply in_or_app; left; exact (anc_key x x Hx)).
@@ -357,12 +369,12 @@ Section Checks.
       pose proof (proj2 (mem_iff x (ancestors g x)) Hm0) as Hm.
       unfold cycle_at in Hc. pose proof (find_none _ _ Hc x Hin) as Hf.
       cbn in Hf. rewrite Hm in Hf. discriminate Hf.
-    - intros (Hnd & Hdp & Hd & Hr & Hac).
+    - intros (Hnd & Hdp & HdA & HdB & Hg & Hr & Hac).
       assert (E0 : nodupb (lin_nodes g) = true) by (apply nodupb_iff; exact Hnd).
       rewrite E0.
       assert (E1 : declared_parents_b = true) by (apply declared_parents_iff; exact Hdp).
       rewrite E1.
-      assert (E2 : distinguished_b = true) by (apply distinguished_iff; exact Hd).
+      assert (E2 : distinguished_b = true) by (apply distinguished_iff; exact (conj HdA (conj HdB Hg))).
       rewrite E2.
       assert (E3 : relevant_b = true) by (apply relevant_iff; exact Hr).
       rewrite E3.
@@ -381,15 +393,64 @@ Section Checks.
   Definition descends_a : bool := mem (lin_dA g) (ancestors g (lin_ground g)).
   Definition descends_b : bool := mem (lin_dB g) (ancestors g (lin_ground g)).
 
-  Theorem check_L1_reflect : (negb descends_a && negb descends_b = true) <-> L1 g.
+  Definition ground_eq_a : bool :=
+    Nat.eqb (lin_ground g) (lin_dA g).
+
+  Definition ground_eq_b : bool :=
+    Nat.eqb (lin_ground g) (lin_dB g).
+
+  Definition check_L1 : bool :=
+    negb ground_eq_a &&
+    negb ground_eq_b &&
+    negb descends_a &&
+    negb descends_b.
+
+  Theorem check_L1_reflect : check_L1 = true <-> L1 g.
   Proof.
-    unfold descends_a, descends_b, L1. rewrite Bool.andb_true_iff, !Bool.negb_true_iff.
+    unfold check_L1, ground_eq_a, ground_eq_b,
+      descends_a, descends_b, L1.
+    rewrite !Bool.andb_true_iff, !Bool.negb_true_iff.
     split.
-    - intros [Ha Hb]. split; intro H; apply anc_mem in H;
-        [rewrite H in Ha | rewrite H in Hb]; discriminate.
-    - intros [Ha Hb]. split;
-        [destruct (mem _ _) eqn:E; [exfalso; apply Ha, anc_mem; exact E | reflexivity]
-        |destruct (mem _ _) eqn:E; [exfalso; apply Hb, anc_mem; exact E | reflexivity]].
+    - intros [[[Hga Hgb] Ha] Hb].
+      repeat split.
+      + intro E.
+        rewrite E, Nat.eqb_refl in Hga.
+        discriminate.
+      + intro E.
+        rewrite E, Nat.eqb_refl in Hgb.
+        discriminate.
+      + intro H.
+        apply anc_mem in H.
+        rewrite H in Ha.
+        discriminate.
+      + intro H.
+        apply anc_mem in H.
+        rewrite H in Hb.
+        discriminate.
+    - intros (Hga & Hgb & Ha & Hb).
+      repeat split.
+      + destruct (Nat.eqb (lin_ground g) (lin_dA g)) eqn:E.
+        * exfalso.
+          apply Hga.
+          apply Nat.eqb_eq.
+          exact E.
+        * reflexivity.
+      + destruct (Nat.eqb (lin_ground g) (lin_dB g)) eqn:E.
+        * exfalso.
+          apply Hgb.
+          apply Nat.eqb_eq.
+          exact E.
+        * reflexivity.
+      + destruct (mem (lin_dA g) (ancestors g (lin_ground g))) eqn:E.
+        * exfalso.
+          apply Ha, anc_mem.
+          exact E.
+        * reflexivity.
+      + destruct (mem (lin_dB g) (ancestors g (lin_ground g))) eqn:E.
+        * exfalso.
+          apply Hb, anc_mem.
+          exact E.
+        * reflexivity.
   Qed.
 
   Definition disposed_b (n : nat) : bool :=
@@ -459,33 +520,45 @@ Section Checks.
     negb (mem n (ancestors g (lin_dA g))) && negb (mem n (ancestors g (lin_dB g))) &&
     negb (Nat.eqb n (lin_dA g)) && negb (Nat.eqb n (lin_dB g)).
 
-  Definition check_L3 : bool := existsb source_pred (ancestors g (lin_ground g)).
+  Definition check_L3 : bool :=
+    existsb source_pred (lin_ground g :: ancestors g (lin_ground g)).
 
   Theorem check_L3_reflect : check_L3 = true <-> L3 g.
   Proof.
     unfold check_L3, L3. rewrite existsb_exists. split.
-    - intros (n & Hin & Hp). unfold source_pred in Hp.
+    - intros (n & Hin & Hp).
+      unfold source_pred in Hp.
       rewrite !Bool.andb_true_iff, !Bool.negb_true_iff, !Nat.eqb_neq in Hp.
       destruct Hp as [[[[[Hr Hv] Ha] Hb] Hna] Hnb].
       exists n. unfold lin_is_raw, lin_is_relevant.
-      refine (conj (proj1 (mem_iff _ _) Hr) (conj (proj1 (mem_iff _ _) Hv) (conj _ (conj _ (conj _ (conj _ _)))))).
-      + exact (ancestors_sound g _ _ Hin).
+      refine
+        (conj (proj1 (mem_iff _ _) Hr)
+          (conj (proj1 (mem_iff _ _) Hv)
+            (conj _ (conj _ (conj _ (conj _ _)))))).
+      + destruct Hin as [Hg | Hin].
+        * left. symmetry. exact Hg.
+        * right. exact (ancestors_sound g _ _ Hin).
       + intro H. apply anc_mem in H. rewrite H in Ha. discriminate.
       + intro H. apply anc_mem in H. rewrite H in Hb. discriminate.
       + exact Hna.
       + exact Hnb.
     - intros (n & Hr & Hv & Hg & Ha & Hb & Hna & Hnb).
       exists n. split.
-      + apply mem_iff, anc_mem. exact Hg.
-      + unfold source_pred. rewrite !Bool.andb_true_iff, !Bool.negb_true_iff, !Nat.eqb_neq.
+      + destruct Hg as [Hg | Hg].
+        * left. symmetry. exact Hg.
+        * right. apply mem_iff, anc_mem. exact Hg.
+      + unfold source_pred.
+        rewrite !Bool.andb_true_iff, !Bool.negb_true_iff, !Nat.eqb_neq.
         unfold lin_is_raw, lin_is_relevant in *.
         refine (conj (conj (conj (conj (conj _ _) _) _) Hna) Hnb).
         * apply mem_iff. exact Hr.
         * apply mem_iff. exact Hv.
-        * destruct (mem n (ancestors g (lin_dA g))) eqn:E;
-            [exfalso; apply Ha, anc_mem; exact E | reflexivity].
-        * destruct (mem n (ancestors g (lin_dB g))) eqn:E;
-            [exfalso; apply Hb, anc_mem; exact E | reflexivity].
+        * destruct (mem n (ancestors g (lin_dA g))) eqn:E.
+          -- exfalso. apply Ha, anc_mem. exact E.
+          -- reflexivity.
+        * destruct (mem n (ancestors g (lin_dB g))) eqn:E.
+          -- exfalso. apply Hb, anc_mem. exact E.
+          -- reflexivity.
   Qed.
 End Checks.
 
@@ -495,7 +568,9 @@ Definition lineage_defect (g : Lineage) : option LineageDefect :=
   match wf_defect g with
   | Some d => Some (Malformed d)
   | None =>
-      if descends_a g then Some DescentFromA
+      if ground_eq_a g then Some GroundEqualsA
+      else if ground_eq_b g then Some GroundEqualsB
+      else if descends_a g then Some DescentFromA
       else if descends_b g then Some DescentFromB
       else match undisclosed g with
            | Some n => Some (UndisclosedShared n)
@@ -508,7 +583,9 @@ Definition WfEvidence (g : Lineage) (d : WfDefect) : Prop :=
   | DuplicateNode => ~ NoDup (lin_nodes g)
   | UndeclaredParent => ~ DeclEntries g
   | DistinguishedNotDerived =>
-      ~ (forall n, In n [lin_dA g; lin_dB g; lin_ground g] -> In n (map fst (lin_derived g)))
+      ~ (In (lin_dA g) (map fst (lin_derived g)) /\
+         In (lin_dB g) (map fst (lin_derived g)) /\
+         In (lin_ground g) (lin_nodes g))
   | RelevantNotRaw => ~ (forall n, lin_is_relevant g n -> lin_is_raw g n)
   | Cycle n => Ancestor g n n
   end.
@@ -516,6 +593,8 @@ Definition WfEvidence (g : Lineage) (d : WfDefect) : Prop :=
 Definition DefectEvidence (g : Lineage) (d : LineageDefect) : Prop :=
   match d with
   | Malformed w => WfEvidence g w
+  | GroundEqualsA => lin_ground g = lin_dA g
+  | GroundEqualsB => lin_ground g = lin_dB g
   | DescentFromA => Ancestor g (lin_ground g) (lin_dA g)
   | DescentFromB => Ancestor g (lin_ground g) (lin_dB g)
   | UndisclosedShared n =>
@@ -552,44 +631,79 @@ Proof.
   - intro H. injection H as <-. exact (wf_defect_evidence g w Hw).
   - pose proof (proj1 (wf_defect_none_iff g) Hw) as (_ & Hdp & _).
     pose proof (decl_parents_of_entries g Hdp) as HD.
-    destruct (descends_a g) eqn:Ha.
-    + intro H. injection H as <-. cbn. apply (anc_mem g HD). exact Ha.
-    + destruct (descends_b g) eqn:Hb.
-      * intro H. injection H as <-. cbn. apply (anc_mem g HD). exact Hb.
-      * destruct (undisclosed g) as [n|] eqn:Hu.
-        -- intro H. injection H as <-. exact (undisclosed_some_evidence g HD n Hu).
-        -- destruct (check_L3 g) eqn:H3; intro H; [discriminate|].
-           injection H as <-. cbn. intro H'. apply (check_L3_reflect g HD) in H'.
-           rewrite H3 in H'. discriminate.
+    destruct (ground_eq_a g) eqn:Hga.
+    + intro H. injection H as <-. cbn.
+      unfold ground_eq_a in Hga.
+      apply Nat.eqb_eq in Hga.
+      exact Hga.
+    + destruct (ground_eq_b g) eqn:Hgb.
+      * intro H. injection H as <-. cbn.
+        unfold ground_eq_b in Hgb.
+        apply Nat.eqb_eq in Hgb.
+        exact Hgb.
+      * destruct (descends_a g) eqn:Ha.
+        -- intro H. injection H as <-. cbn.
+           apply (anc_mem g HD). exact Ha.
+        -- destruct (descends_b g) eqn:Hb.
+           ++ intro H. injection H as <-. cbn.
+              apply (anc_mem g HD). exact Hb.
+           ++ destruct (undisclosed g) as [n|] eqn:Hu.
+              ** intro H. injection H as <-.
+                 exact (undisclosed_some_evidence g HD n Hu).
+              ** destruct (check_L3 g) eqn:H3; intro H; [discriminate|].
+                 injection H as <-. cbn. intro H'.
+                 apply (check_L3_reflect g HD) in H'.
+                 rewrite H3 in H'. discriminate.
 Qed.
 
 Theorem lineage_defect_none_iff g : lineage_defect g = None <-> LineagePasses g.
 Proof.
   unfold lineage_defect, LineagePasses. split.
-  - intro H. destruct (wf_defect g) as [w|] eqn:Hw; [discriminate|].
+  - intro H.
+    destruct (wf_defect g) as [w|] eqn:Hw; [discriminate|].
     pose proof (proj1 (wf_defect_none_iff g) Hw) as Hwf.
     pose proof (decl_parents_of_entries g (proj1 (proj2 Hwf))) as HD.
+    destruct (ground_eq_a g) eqn:Hga; [discriminate|].
+    destruct (ground_eq_b g) eqn:Hgb; [discriminate|].
     destruct (descends_a g) eqn:Ha; [discriminate|].
     destruct (descends_b g) eqn:Hb; [discriminate|].
     destruct (undisclosed g) as [n|] eqn:Hu; [discriminate|].
     destruct (check_L3 g) eqn:H3; [|discriminate].
     refine (conj Hwf (conj _ (conj _ _))).
-    + apply (check_L1_reflect g HD). unfold descends_a, descends_b in *.
-      rewrite Ha, Hb. reflexivity.
+    + apply (check_L1_reflect g HD).
+      unfold check_L1.
+      rewrite Hga, Hgb, Ha, Hb.
+      reflexivity.
     + apply (undisclosed_none_iff g HD). exact Hu.
     + apply (check_L3_reflect g HD). exact H3.
   - intros (Hwf & L1h & L2h & L3h).
-    assert (Hw : wf_defect g = None) by (apply wf_defect_none_iff; exact Hwf).
+    assert (Hw : wf_defect g = None) by
+      (apply wf_defect_none_iff; exact Hwf).
     pose proof (decl_parents_of_entries g (proj1 (proj2 Hwf))) as HD.
     rewrite Hw.
-    apply (check_L1_reflect g HD) in L1h. unfold descends_a, descends_b in *.
-    apply Bool.andb_true_iff in L1h as [Ha Hb].
-    apply Bool.negb_true_iff in Ha. apply Bool.negb_true_iff in Hb.
-    rewrite Ha, Hb.
-    assert (Hu : undisclosed g = None) by (apply (undisclosed_none_iff g HD); exact L2h).
+
+    apply (check_L1_reflect g HD) in L1h.
+    unfold check_L1 in L1h.
+
+    apply Bool.andb_true_iff in L1h as [H123 Hb].
+    apply Bool.andb_true_iff in H123 as [H12 Ha].
+    apply Bool.andb_true_iff in H12 as [Hga Hgb].
+
+    apply Bool.negb_true_iff in Hga.
+    apply Bool.negb_true_iff in Hgb.
+    apply Bool.negb_true_iff in Ha.
+    apply Bool.negb_true_iff in Hb.
+
+    rewrite Hga, Hgb, Ha, Hb.
+
+    assert (Hu : undisclosed g = None) by
+      (apply (undisclosed_none_iff g HD); exact L2h).
     rewrite Hu.
-    assert (H3 : check_L3 g = true) by (apply (check_L3_reflect g HD); exact L3h).
-    rewrite H3. reflexivity.
+
+    assert (H3 : check_L3 g = true) by
+      (apply (check_L3_reflect g HD); exact L3h).
+    rewrite H3.
+    reflexivity.
 Qed.
 
 Definition lineage_check (g : Lineage) (c : CoverageRecord) : LineageDecision :=
