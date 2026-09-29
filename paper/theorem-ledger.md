@@ -42,7 +42,7 @@ calculus, statement unchanged), **new**, **conjectural**.
 | Checker rejection -> located `ConstructionFailure` | new | `Debt/LineageAssessment.v` |
 | `PackedWarrant`; same endpoints, different problems | new | `Debt/PackedWarrant.v`, `examples/DifferentWarrants.v` |
 | `EvidenceSummary` interface | new | `Debt/Certificates.v` |
-| Extracted checker agrees with the handwritten OCaml audit (5/5 case study, 3000/3000 random) | tested, NOT a theorem | `extraction/run_lineage_regression.sh` |
+| Extracted checker agrees with the handwritten OCaml audit (5/5 case study; since v6, 1921/1921 random on the legacy overlap, 1079 of 3000 skipped) | tested, NOT a theorem | `extraction/run_lineage_regression.sh` |
 | Handwritten OCaml audit proved equivalent to `LineagePasses` | conjectural (superseded by replacing its decision core) | - |
 | Regional obstruction; fork/order/quorum obstructions | existing, separate | - |
 
@@ -53,3 +53,12 @@ calculus, statement unchanged), **new**, **conjectural**.
 | Certificate reissue; no evidence lift when grounding is lost | new (example) | `examples/CertificateReissue.v` |
 | Legacy vs full transportability: refutation soundness at the correct level | new | `Debt/TransportAssessment.v` |
 | Deep-ancestry populations; 13-mutant, per-suite study | tested, NOT a theorem | `extraction/` |
+
+## V6 lineage milestone (2026-09-29)
+
+| Claim | Status | Where |
+|---|---|---|
+| Checker reflects the v6 conditions (ground identity in L1, declared ground in WF, the ground may be its own L3 source) | proved; theorem names unchanged | `check_L1_reflect`, `check_L3_reflect`, `lineage_defect_none_iff`, `lineage_check_reflect` |
+| L1 composes across consecutive coordinate pairs, for a fixed graph and ground | proved | `L1_at_composes` (`examples/LineageNonComposition.v`) |
+| L2 does not compose: AB and BC pass, AC fails only L2 | proved countermodel | `disclosure_noncomposition` |
+| L3 does not compose: AB and BC pass, AC fails only L3 | proved countermodel | `source_noncomposition` |

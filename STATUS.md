@@ -1,10 +1,76 @@
-# Status (2026-09-21, after the checked-lineage-audit milestone)
+# Status (2026-09-29, after the V6 lineage milestone)
 
 Reference environment: Coq 8.18.0, OCaml 4.14.1. Builds under `coq_makefile` and
 `dune build --root .`. `coqchk` passes on the whole project; on the project
 without `ClassicalFactorisation.v` it succeeds and reports no axioms. `Print
 Assumptions` is "closed under the global context" for every theorem listed
 below except `constant_factors`.
+
+## V6 lineage milestone (2026-09-29)
+
+Branch `copied-agreement-v6-lineage`, verified at `6752b7f`; `main` is unchanged
+at `51284d0`. Figures in the older sections below predate this milestone.
+
+**Lineage semantics (Copied Agreement v6, `f61dbae`).** `Debt/Certificates.v`
+and `Debt/LineageCheck.v` now implement:
+
+| Clause | Before v6 | v6 |
+|---|---|---|
+| WF (3) | `d_A`, `d_B` and the ground are derived | `d_A` and `d_B` are derived; the ground is a declared node and may be raw |
+| L1 | the ground does not descend from `d_A` or `d_B` | in addition, the ground is neither `d_A` nor `d_B` |
+| L3 | some claim-relevant raw input is a strict ancestor of the ground and is neither equal to nor an ancestor of `d_A` or `d_B` | as before, except that the source may be the ground itself |
+
+The identity clauses are needed because `Ancestor` is strict, and irreflexive on
+well-formed graphs, so descent alone does not exclude a ground equal to a
+coordinate. The checker reports the new defects `GroundEqualsA` and
+`GroundEqualsB` after well-formedness and before descent, and
+`ConstructionFailure` gains `LineageCoordinateIdentity`. The reflection theorems
+keep their names (`check_L1_reflect`, `check_L3_reflect`,
+`lineage_defect_none_iff`, `lineage_check_reflect`). The well-formedness defect
+for clause (3) is still called `DistinguishedNotDerived`, although for the
+ground it now means "not a declared node".
+
+**Non-composition (`examples/LineageNonComposition.v`; `85e8f55`, `42d3d85`).**
+For a fixed graph and a fixed ground, L1 composes across consecutive coordinate
+pairs (`L1_at_composes`): the outer pair inherits the A clauses from AB and the
+C clauses from BC. L2 and L3 do not compose. In `disclosure_noncomposition`, AB
+and BC pass while AC is well-formed and satisfies L1 and L3 but fails L2, with
+node 4 an undisclosed shared ancestor. In `source_noncomposition`, AB and BC
+pass while AC is well-formed and satisfies L1 and L2 but fails L3. In both
+countermodels every field except the coordinates is fixed, and no composition
+operator is defined or assumed. Pairwise lineage acceptance therefore does not
+remove the need for a fresh lineage audit of the outer coordinate pair.
+
+**Harness (`d076525`).** `extraction/run_lineage_regression.sh` previously
+failed after a Dune-only build. It now finds the repository from its own path,
+reads compiled libraries from `_build/default` when present and from the source
+tree otherwise (`GTC_LIBROOT` overrides the choice), and compiles
+`ExtractLineageCheck.v` inside the work directory. The commands are in the
+README under Verification. `_CoqProject` now lists
+`examples/LineageNonComposition.v`, which Dune built but `coq_makefile` did not.
+
+**Verification at `6752b7f`.** A clean `dune build` exited 0. `coqchk` exited 0
+on `GTCExamples.LineageNonComposition` and its dependencies, with the
+`Exactness`, `GTC` and `GTCExamples` roots taken from `_build/default`. The new
+file contains no `Admitted`, `admit`, `Axiom` or `Parameter`. The regression
+suite exited 0: case study 5/5; random differential 1921/1921 on the legacy
+overlap, with 1079 of 3000 records skipped; v6 edge cases 6/6; all 17
+stratified populations (11 shallow, 6 deep) at 300/300 on both the intended
+verdict and the handwritten flags. The mutation matrix exited 0 with 17/17
+mutants detected by the union of suites; by suite alone, stratified 13, shallow
+11, deep 8, random 12, fixed case study 5, v6 edge suite 4. M14 to M17 (omit
+ground != d_A; omit ground != d_B; exclude the ground from the L3 candidates;
+require the ground to be derived) are detected only by the v6 edge suite. For
+this documentation commit, `Print Assumptions` reports every theorem named in
+this section, and `defect_sound`, `lineage_check_rejected`,
+`lineage_check_open`, `issue_certificate_iff` and `located_refutes_legacy`, as
+closed under the global context; the `coq_makefile` build compiles the new
+example; and the README verification commands pass as written.
+
+The handwritten audit belongs to the unchanged legacy supplement and does not
+implement the v6 clauses, so the random differential comparison is restricted
+to the legacy overlap. The v6 clauses are tested against intended verdicts by
+the edge suite, and M14 to M17 probe them.
 
 ## Review response (2026-09-22)
 
@@ -100,7 +166,10 @@ the conditional form the outline anticipated).
 ## Paper draft
 `document/`: LaTeX first draft (~23 pages), see `document/README.md`.
 
-## Latest milestone: the audit gap, closed for the Coq specification
+## Earlier milestone: the audit gap, closed for the Coq specification
+
+Figures in this section predate the v6 lineage semantics; current figures are in
+the V6 lineage milestone section at the top.
 
 The principal formal gap was that `LineagePasses` (a Prop) and the OCaml audit
 had no connection. Now:
@@ -212,7 +281,8 @@ derived: `certified_witness_at` gives an `RPath` at every seam crossing.
   of a generic `GTransport` (`rich_structure`). Erasure is two-stage and lossy:
   `RPath -> OPath` (drop certificates) `-> rval x = rval y` (drop crossings).
 - Failures are data: `FibreWitness`, `SeamEmpty`, `GroundingFailure r`,
-  `ExhibitionDefeated`, `LineageDescent`, `LineageUndisclosed n`,
+  `ExhibitionDefeated`, `LineageCoordinateIdentity`, `LineageDescent`,
+  `LineageUndisclosed n`,
   `LineageNoIndependentSource`, `LineageMalformed`, `MaintenanceFailureAt`
   (no evolution, or a lost seam element per evolution).
 
@@ -261,8 +331,9 @@ institutional debt. Certificates are ISSUED outside the kernel.
 ## What is and is not connected
 - `LineagePasses` is a Coq specification of Definition 13. `lineage_check` is
   PROVED to decide it. The handwritten OCaml audit is NOT proved equivalent; it is
-  regression-tested against the extracted checker (case study and 3000 random
-  records). The handwritten OCaml still does not construct certificates; the
+  regression-tested against the extracted checker (case study and random
+  records; since v6 the random comparison covers only the legacy overlap, see the
+  V6 section). The handwritten OCaml still does not construct certificates; the
   extracted checker does (`issue_certificate`).
 - OCaml's justified/open-defeater distinction is modelled by `Disposition`, but
   L2 only requires some disposition, as in the OCaml.

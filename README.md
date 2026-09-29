@@ -18,6 +18,30 @@ coq_makefile -f _CoqProject -o Makefile.coq && make -f Makefile.coq
 dune build --root .
 ```
 
+## Verification
+
+From the repository root, after `dune build --root .`:
+
+```sh
+# kernel check of a module and everything it depends on
+coqchk -R _build/default/legacy/exactness-2026 Exactness \
+       -R _build/default/theories GTC \
+       -R _build/default/examples GTCExamples \
+       GTCExamples.LineageNonComposition
+
+# extracted lineage checker against the handwritten audit
+WORK=$(mktemp -d)
+extraction/run_lineage_regression.sh "$WORK"
+
+# mutation study of the extracted checker, on the same work directory
+python3 extraction/mutation_matrix.py "$WORK"
+```
+
+The regression script can be run from any directory. It reads the compiled
+libraries from `_build/default` when a Dune build exists and from the source
+tree otherwise (a `coq_makefile` build); set `GTC_LIBROOT` to choose
+explicitly. `STATUS.md` records the current results.
+
 ## Layout
 
 | Path | Content |
@@ -27,8 +51,11 @@ dune build --root .
 | `theories/Obstructions` | fibre factorisation, lineage obstruction, ungrounded agreement |
 | `theories/Debt` | four warrant debts (with a proved lineage checker, `LineageCheck.v`): abstract skeleton (decidable classifier) and the located, evidence-bearing layer (certificates, `RPath` witnesses, `TransportAssessment` = Certified / Refuted / Open) |
 | `theories/Instances` | compatibility layer: the *original* grounded seam, `SeamEvolution` and admissibility as instances (`Original*.v`); `ExtensionalSeam.v` is the weaker pairwise-only layer |
-| `examples/` | the original copied counterexample, seam transport, maintenance failure |
+| `examples/` | the original copied counterexample, seam transport, maintenance failure, different warrants, evolution coverage, certificate reissue, lineage certificates, the checked lineage audit, and lineage non-composition |
 | `paper/` | outline, theorem ledger, notation |
 | `legacy/exactness-2026/` | the original supplement, **unchanged** (checksummed); built as library `Exactness` |
+| `extraction/` | extraction of the assessments and of the proved lineage checker; differential regression against the handwritten audit and a mutation study |
+| `document/` | the manuscript (LMCS class) |
+| `milestones/` | frozen, checksummed snapshots of earlier states |
 
 See `STATUS.md` for what is proved, what is recovered from the legacy supplement, and what is open.
