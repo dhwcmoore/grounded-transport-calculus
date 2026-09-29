@@ -9,6 +9,42 @@ From Coq Require Import List.
 Import ListNotations.
 From GTC.Debt Require Import Certificates LineageCheck.
 
+(** L1 viewed at arbitrary coordinates over one fixed lineage graph.
+    This separates the coordinate clause from the record fields so that
+    composition can be stated without defining a seam-composition operator. *)
+Definition L1_at
+    (g : Lineage) (ground dA dB : nat) : Prop :=
+  ground <> dA /\
+  ground <> dB /\
+  ~ Ancestor g ground dA /\
+  ~ Ancestor g ground dB.
+
+(** The manuscript's L1 is exactly L1_at at the distinguished fields. *)
+Lemma L1_as_L1_at (g : Lineage) :
+  L1 g <->
+  L1_at g (lin_ground g) (lin_dA g) (lin_dB g).
+Proof.
+  reflexivity.
+Qed.
+
+(** With graph and ground fixed, L1 composes across consecutive
+    coordinate pairs. AB supplies the A clauses; BC supplies the C
+    clauses. No condition concerning B is needed for the outer pair
+    beyond the hypotheses already present in the two local audits.
+    This uses one fixed [Ancestor g] relation and one fixed ground;
+    it does not assert transport across changing graphs or grounds. *)
+Theorem L1_at_composes :
+  forall (g : Lineage) (ground A B C : nat),
+    L1_at g ground A B ->
+    L1_at g ground B C ->
+    L1_at g ground A C.
+Proof.
+  intros g ground A B C.
+  intros [HgroundA [_ [HancA _]]]
+         [_ [HgroundC [_ HancC]]].
+  repeat split; assumption.
+Qed.
+
 Definition noncomposition_coverage : CoverageRecord :=
   {| cov_from := 0; cov_to := 1; cov_gaps := [] |}.
 
