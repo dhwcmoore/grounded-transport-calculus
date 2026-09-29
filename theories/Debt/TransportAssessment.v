@@ -58,6 +58,10 @@ Inductive ConstructionFailure (c : EvCandidate) : Type :=
     ConstructionFailure c
 | ExhibitionDefeated :
     (ExhibitionCertificate (ecSpan c) (ecPs c) -> False) -> ConstructionFailure c
+| LineageCoordinateIdentity :
+    (lin_ground (ecLineage c) = lin_dA (ecLineage c) \/
+     lin_ground (ecLineage c) = lin_dB (ecLineage c)) ->
+    ConstructionFailure c
 | LineageDescent :
     (Ancestor (ecLineage c) (lin_ground (ecLineage c)) (lin_dA (ecLineage c)) \/
      Ancestor (ecLineage c) (lin_ground (ecLineage c)) (lin_dB (ecLineage c))) ->
@@ -94,12 +98,15 @@ Proof.
   intros f cc.
   pose proof (lineage_certificate_passes (cc_lineage cc)) as (wf & l1 & l2 & l3).
   rewrite (cc_lineage_declared cc) in wf, l1, l2, l3.
-  destruct f as [e|r H|e|[H|H]|n H1 H2 H3 H4|H|H].
+  destruct l1 as (Hga & Hgb & Hda & Hdb).
+  destruct f as [e|r H|e|[H|H]|[H|H]|n H1 H2 H3 H4|H|H].
   - exact (e (cc_inhabitant cc)).
   - destruct (cc_grounding cc r) as [ga gb]. destruct H as [H|H]; [exact (H ga) | exact (H gb)].
   - exact (e (cc_exhibition cc)).
-  - exact (proj1 l1 H).
-  - exact (proj2 l1 H).
+  - exact (Hga H).
+  - exact (Hgb H).
+  - exact (Hda H).
+  - exact (Hdb H).
   - exact (H4 (l2 n H1 H2 H3)).
   - exact (H l3).
   - exact (H wf).
@@ -180,14 +187,18 @@ Theorem located_refutes_legacy c (l : Located c) :
 Proof.
   intros Hnot (hs & hex & hlin & hA & hB & hG & hm).
   destruct hlin as (wf & l1 & l2 & l3).
+  destruct l1 as (Hga & Hgb & Hda & Hdb).
   destruct l as [[w|w] | f | f | f]; cbn in Hnot; try discriminate Hnot.
   - exact (fibre_witness_refutes _ _ w hA).
   - exact (fibre_witness_refutes _ _ w hB).
-  - destruct f as [e|r H|e|H|n H1 H2 H3 H4|H|H].
+  - destruct f as [e|r H|e|[H|H]|[H|H]|n H1 H2 H3 H4|H|H].
     + destruct hs as [s]. exact (e s).
     + destruct (hG r) as [ga gb]. destruct H as [H|H]; [exact (H ga) | exact (H gb)].
     + destruct hex as [ex]. exact (e ex).
-    + destruct H as [H|H]; [exact (proj1 l1 H) | exact (proj2 l1 H)].
+    + exact (Hga H).
+    + exact (Hgb H).
+    + exact (Hda H).
+    + exact (Hdb H).
     + exact (H4 (l2 n H1 H2 H3)).
     + exact (H l3).
     + exact (H wf).

@@ -64,14 +64,16 @@ Section Indep.
 
   Lemma indep_wf : LineageWellFormed g.
   Proof.
-    refine (conj _ (conj _ (conj _ (conj _ _)))).
+    refine (conj _ (conj _ (conj _ (conj _ (conj _ (conj _ _)))))).
     - unfold lin_nodes. cbn.
       repeat constructor; cbn; intro H;
         repeat (destruct H as [H|H]; [discriminate H|]); exact H.
     - intros n ps H p Hp. cbn in H.
       destruct H as [E|[E|[E|[]]]]; inversion E; subst; cbn in Hp;
         destruct Hp as [<-|[]]; unfold lin_nodes; cbn; firstorder.
-    - intros n Hn. cbn in Hn. destruct Hn as [<-|[<-|[<-|[]]]]; cbn; firstorder.
+    - cbn. firstorder.
+    - cbn. firstorder.
+    - unfold lin_nodes. cbn. firstorder.
     - intros n Hn. unfold lin_is_relevant, lin_is_raw in *. cbn in *.
       destruct Hn as [<-|[]]. firstorder.
     - intros n H.
@@ -81,7 +83,19 @@ Section Indep.
   Qed.
 
   Lemma indep_L1 : L1 g.
-  Proof. split; intro H; apply indep_anc5 in H; cbn in H; lia. Qed.
+  Proof.
+    repeat split.
+    - cbn. lia.
+    - cbn. lia.
+    - intro H.
+      apply indep_anc5 in H.
+      cbn in H.
+      lia.
+    - intro H.
+      apply indep_anc5 in H.
+      cbn in H.
+      lia.
+  Qed.
 
   Lemma indep_L2 : L2 g.
   Proof.
@@ -93,7 +107,7 @@ Section Indep.
     exists 2. unfold lin_is_raw, lin_is_relevant. cbn. repeat split.
     - firstorder.
     - left. reflexivity.
-    - apply anc_parent. cbn. left. reflexivity.
+    - right. apply anc_parent. cbn. left. reflexivity.
     - intro H. apply indep_anc3 in H. lia.
     - intro H. apply indep_anc4 in H. lia.
     - lia.
@@ -124,7 +138,10 @@ Lemma copy_descends :
 Proof. apply anc_parent. cbn. left. reflexivity. Qed.
 
 Lemma copy_fails_L1 : ~ L1 copy_lineage.
-Proof. intros [H _]. exact (H copy_descends). Qed.
+Proof.
+  intros (_ & _ & H & _).
+  exact (H copy_descends).
+Qed.
 
 Corollary copy_not_lineage_grounded : ~ LineagePasses copy_lineage.
 Proof. intros (_ & H & _). exact (copy_fails_L1 H). Qed.
