@@ -110,5 +110,39 @@ Define $\mathsf{issue}$ by cases on $\mathsf{defect}(g)$ and $\mathsf{gaps}(\var
 \end{proof}
 Acceptance thus constructs a kernel-checked certificate. This is strictly stronger than an audit that prints a verdict: the extracted checker returns a value whose type records that the graph passes.
 
+\subsection{Pairwise audits do not compose}\label{sec:noncompose}
+For a fixed lineage graph and fixed ground, L1 composes across consecutive coordinate pairs. L2 and L3 do not compose in general. Pairwise accepted lineage audits therefore do not certify the outer coordinate pair.
+
+To state this without a composition operator on lineage records, fix every field of a record $g$ except the coordinates, and write $g[a,b]$ for $g$ with $d_A := a$ and $d_B := b$. The graph, the raw and claim-relevant inputs, the dispositions and the ground $\gamma$ are then the same in $g[A,B]$, $g[B,C]$ and $g[A,C]$, and so is $\mathrm{Anc}_g$, which depends only on $D$.
+
+\begin{prop}[Fixed-ground composition of L1]\label{prop:l1compose}
+For every record $g$ and nodes $A,B,C$: if $g[A,B]$ and $g[B,C]$ satisfy L1, then so does $g[A,C]$. \emph{(Coq: \coq{L1_at_composes}.)}
+\end{prop}
+\begin{proof}
+L1 for $g[a,b]$ is the conjunction of $\gamma \neq a$, $\neg\mathrm{Anc}_g(\gamma,a)$, $\gamma \neq b$ and $\neg\mathrm{Anc}_g(\gamma,b)$. The two clauses for $A$ come from $g[A,B]$ and the two for $C$ from $g[B,C]$.
+\end{proof}
+No well-formedness hypothesis is used. The statement fixes the ground: it says nothing about a composite whose ground, or whose graph, differs from those of the local audits.
+
+\begin{prop}[L2 and L3 need not compose]\label{prop:noncompose}
+There are records $g_2$ and $g_3$, and nodes $A,B,C$ for each, such that $\mathsf{LineagePasses}(g_i[A,B])$ and $\mathsf{LineagePasses}(g_i[B,C])$ hold for $i = 2,3$, while $g_2[A,C]$ is well-formed and satisfies L1 and L3 but not L2, and $g_3[A,C]$ is well-formed and satisfies L1 and L2 but not L3. \emph{(Coq: \coq{disclosure_noncomposition}, \coq{source_noncomposition}.)}
+\end{prop}
+\begin{proof}
+Neither record has dispositions. Write $\mathsf{anc}(n)$ for the set of strict ancestors of $n$.
+
+In $g_2$ the raw inputs are $0,1,2,3$, with $3$ claim-relevant; the derived fields are $4$ with parent $0$, $5$ and $7$ with parent $4$, $6$ with parent $1$, and the ground $8$ with parent $3$; take $(A,B,C) = (5,6,7)$. Then $\mathsf{anc}(5) = \mathsf{anc}(7) = \{0,4\}$, $\mathsf{anc}(6) = \{1\}$ and $\mathsf{anc}(8) = \{3\}$. The ground differs from and descends from no coordinate, $3$ witnesses L3 for every pair, and the pairs $(5,6)$ and $(6,7)$ share no ancestor, so both consecutive records pass. The outer pair $(5,7)$ shares the non-raw ancestor $4$, which has no disposition, so L2 fails, while L1 and L3 hold as before.
+
+In $g_3$ the raw inputs are $0,1,2$, with $0$ and $1$ claim-relevant; the derived fields are $3$ with parent $1$, $4$ with parent $2$, $5$ with parent $0$, and the ground $6$ with parents $0$ and $1$; take $(A,B,C) = (3,4,5)$. No two coordinates share an ancestor, so L2 holds for every pair, and the ground differs from and descends from no coordinate, so L1 holds for every pair. For $(3,4)$ the input $0$ witnesses L3, and for $(4,5)$ the input $1$ does. For $(3,5)$ the only claim-relevant raw ancestors of the ground are $0$ and $1$, with $1 \in \mathsf{anc}(3)$ and $0 \in \mathsf{anc}(5)$, and the ground itself is not raw, so L3 fails.
+
+Well-formedness of the six records, and the checker's verdicts (accepted for the consecutive pairs; $\mathsf{UndisclosedShared}(4)$ and $\mathsf{NoIndependentSource}$ for the two outer pairs), are established by computation and \cref{thm:reflect}.
+\end{proof}
+
+\begin{cor}[Fresh outer audit]\label{cor:freshaudit}
+In general, lineage certificates for $g[A,B]$ and $g[B,C]$ do not yield one for $g[A,C]$: for the records of \cref{prop:noncompose}, the first two exist and the third does not. A lineage certificate for the outer pair therefore requires a fresh audit of that pair.
+\end{cor}
+\begin{proof}
+A lineage certificate carries proofs of well-formedness and L1--L3 for its graph (\cref{def:certs}), so none exists for $g_i[A,C]$. For the consecutive records, with empty gaps, \cref{thm:issue} issues one.
+\end{proof}
+Composition of witnesses (\cref{thm:refl}) stays within one transport problem, and so under one lineage record. The outer pair $g[A,C]$ is a different record, which is why it needs its own audit.
+
 \subsection{What the reflection theorem does not prove}
 It proves equivalence between the Coq checker and the Coq specification. It does \emph{not} prove that the extracted checker agrees with an arbitrary handwritten implementation at the source-language semantic level; extraction remains within the stated trust boundary, and agreement with a handwritten audit is evidence of a different kind (\cref{sec:mechanisation}). Nor does it show that the declared graph contains every real production path.

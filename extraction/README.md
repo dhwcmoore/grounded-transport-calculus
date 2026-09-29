@@ -2,7 +2,8 @@
 
 `ExtractLineageCheck.v` extracts the PROVED lineage checker; `run_lineage_regression.sh`
 builds it and runs `lineage_regression.ml` against the handwritten audit
-(case study plus 3000 random records).
+(case study; random records on the legacy overlap; stratified populations; v6
+edge cases).
 
 `ExtractAssessment.v` extracts the assessments of the examples to OCaml; 
 `inspect_assessment.ml` consumes them. Their point: the certificates and located
@@ -18,8 +19,9 @@ The lineage checker (`theories/Debt/LineageCheck.v`) is proved to reflect `Linea
 its agreement with the handwritten audit is tested, not proved.
 
 In the Rocq development, the evidence layer (`theories/Debt/Certificates.v`)
-defines `LineagePasses`, a Coq specification of Definition 13 mirroring the audit
-by inspection, and `LineageCertificate` carrying its proofs. Equivalence with the
+defines `LineagePasses`, the Coq form of the lineage specification (since v6 it no
+longer matches the handwritten audit everywhere; see Legacy overlap below), and
+`LineageCertificate` carrying its proofs. Equivalence with the
 OCaml audit is NOT proved, and the OCaml does not build kernel certificates.
 
 In the interface layer, conditions (a) exhibition and (b) lineage grounding are
@@ -29,7 +31,25 @@ The audit decides (b) on declared lineage records outside Coq; it is not
 verified against those Props. That link is open work.
 
 ## Stratified regression and mutation study
-`run_lineage_regression.sh` also runs eleven stratified populations (300 graphs
-each) with intended outcomes. `mutation_matrix.py WORKDIR` (WORKDIR = the output
-directory of the regression script) mutates the extracted checker twelve ways and
-reports which stage of the harness detects each. Both are tests, not theorems.
+`run_lineage_regression.sh` also runs seventeen stratified populations (eleven
+shallow and six deep, 300 graphs each) with intended outcomes, and six v6 edge
+cases. `mutation_matrix.py WORKDIR` (WORKDIR = the work directory given to the
+regression script) mutates the extracted checker seventeen ways and reports which
+suite detects each. Both are tests, not theorems.
+
+## Legacy overlap
+The handwritten audit predates the v6 conditions, so the random comparison uses
+only records in the legacy overlap (`legacy_overlap` in `lineage_regression.ml`):
+the ground differs from both coordinates and is not a purely raw node. On these
+records the v6 and earlier conditions coincide. Records outside it are skipped,
+not resampled (1079 of 3000 at the time of writing); the v6 clauses are tested by
+the edge cases instead.
+
+## Usage
+From the repository root, after `dune build --root .`:
+
+```sh
+WORK=$(mktemp -d)
+extraction/run_lineage_regression.sh "$WORK"
+python3 extraction/mutation_matrix.py "$WORK"
+```

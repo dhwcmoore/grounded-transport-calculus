@@ -39,7 +39,9 @@ node 4 an undisclosed shared ancestor. In `source_noncomposition`, AB and BC
 pass while AC is well-formed and satisfies L1 and L2 but fails L3. In both
 countermodels every field except the coordinates is fixed, and no composition
 operator is defined or assumed. Pairwise lineage acceptance therefore does not
-remove the need for a fresh lineage audit of the outer coordinate pair.
+remove the need for a fresh lineage audit of the outer coordinate pair. The manuscript
+now presents these results in its lineage section, with the Coq graphs as the
+printed proofs.
 
 **Harness (`d076525`).** `extraction/run_lineage_regression.sh` previously
 failed after a Dune-only build. It now finds the repository from its own path,
@@ -329,7 +331,7 @@ the declared seam is what actually happened. Those are construction and
 institutional debt. Certificates are ISSUED outside the kernel.
 
 ## What is and is not connected
-- `LineagePasses` is a Coq specification of Definition 13. `lineage_check` is
+- `LineagePasses` is the Coq form of the lineage specification. `lineage_check` is
   PROVED to decide it. The handwritten OCaml audit is NOT proved equivalent; it is
   regression-tested against the extracted checker (case study and random
   records; since v6 the random comparison covers only the legacy overlap, see the
