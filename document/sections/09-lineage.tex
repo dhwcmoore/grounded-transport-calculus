@@ -9,15 +9,17 @@ A \emph{lineage record} $g$ is finite data: a list $D$ of pairs $(n,\mathit{ps})
 $\mathrm{Anc}_g(n,m)$ (``$m$ is a strict ancestor of $n$'') is the least relation with $\mathrm{Anc}_g(n,m)$ whenever $m \in \mathsf{parents}_g(n)$, and $\mathrm{Anc}_g(n,m)$ whenever $p \in \mathsf{parents}_g(n)$ and $\mathrm{Anc}_g(p,m)$.
 
 \begin{defi}[Lineage conditions]\label{def:L}
-$\mathsf{WF}(g)$ holds iff: (1) $\mathsf{nodes}(g)$ is duplicate-free; (2) every parent of every entry is in $\mathsf{nodes}(g)$; (3) $d_A,d_B,\gamma \in \mathsf{dom}(D)$; (4) $\mathit{Rel} \subseteq \mathit{Raw}$; (5) $\neg\mathrm{Anc}_g(n,n)$ for all $n$. Further:
+$\mathsf{WF}(g)$ holds iff: (1) $\mathsf{nodes}(g)$ is duplicate-free; (2) every parent of every entry is in $\mathsf{nodes}(g)$; (3) $d_A,d_B \in \mathsf{dom}(D)$ and $\gamma \in \mathsf{nodes}(g)$; (4) $\mathit{Rel} \subseteq \mathit{Raw}$; (5) $\neg\mathrm{Anc}_g(n,n)$ for all $n$. Further:
 \begin{description}
-\item[L1] (no descent) $\neg\mathrm{Anc}_g(\gamma,d_A)$ and $\neg\mathrm{Anc}_g(\gamma,d_B)$;
+\item[L1] (no identity, no descent) $\gamma \neq d_A$, $\gamma \neq d_B$, $\neg\mathrm{Anc}_g(\gamma,d_A)$ and $\neg\mathrm{Anc}_g(\gamma,d_B)$;
 \item[L2] (disclosure) every $n$ with $\mathrm{Anc}_g(d_A,n)$, $\mathrm{Anc}_g(d_B,n)$ and $n \notin \mathit{Raw}$ lies in $\mathsf{dom}(\Delta)$;
-\item[L3] (independent source) some $n \in \mathit{Raw} \cap \mathit{Rel}$ has $\mathrm{Anc}_g(\gamma,n)$, $\neg\mathrm{Anc}_g(d_A,n)$, $\neg\mathrm{Anc}_g(d_B,n)$, $n \neq d_A$, $n \neq d_B$.
+\item[L3] (independent source) some $n \in \mathit{Raw} \cap \mathit{Rel}$ has $n = \gamma$ or $\mathrm{Anc}_g(\gamma,n)$, $\neg\mathrm{Anc}_g(d_A,n)$, $\neg\mathrm{Anc}_g(d_B,n)$, $n \neq d_A$, $n \neq d_B$.
 \end{description}
 $\mathsf{LineagePasses}(g) :\equiv \mathsf{WF}(g) \wedge \mathrm{L1} \wedge \mathrm{L2} \wedge \mathrm{L3}$.
 \end{defi}
-\paragraph{Status of L1--L3.} These conditions are \emph{declared specifications}, not derived results. They formalise three intelligible requirements on what it means for a seam valuation to be grounded independently of the coordinates it grounds: it must not descend from them (L1), any ancestry it shares with them must be disclosed (L2), and it must draw on at least one claim-relevant source that they do not (L3). We do not prove that they are necessary or sufficient for every adequate notion of grounding, and a different regime could adopt different conditions. What is proved is what the calculus needs of them: the copy pattern of \cref{sec:example} violates L1, and the checker below decides exactly these conditions.
+\paragraph{Status of L1--L3.} These conditions are \emph{declared specifications}, not derived results. They formalise three intelligible requirements on what it means for a seam valuation to be grounded independently of the coordinates it grounds: it must be neither one of them nor descended from them (L1), any ancestry it shares with them must be disclosed (L2), and it must draw on at least one claim-relevant source, possibly itself, that they do not (L3). We do not prove that they are necessary or sufficient for every adequate notion of grounding, and a different regime could adopt different conditions. What is proved is what the calculus needs of them: the copy pattern of \cref{sec:example} violates L1, and the checker below decides exactly these conditions.
+
+\paragraph{Coordinates and ground.} Clause (3) of $\mathsf{WF}$ requires the coordinates $d_A$ and $d_B$ to be derived but requires the ground $\gamma$ only to be a declared node, so a raw input may serve as the ground. L3 accordingly ranges over $\gamma$ together with its strict ancestors, so that such a ground can be its own independent source. The identity clauses of L1 are not redundant: $\mathrm{Anc}_g$ is strict, and irreflexive under clause (5), so without them a ground equal to $d_A$ or $d_B$ would pass the descent test.
 
 A passing verdict applies only to the declared graph \emph{and} its declared coverage: a partial record must not be reported as globally lineage-grounded. In the running example the ground $\gamma$ of the copied graph descends from $d_A$, so it violates L1.
 
@@ -47,16 +49,16 @@ Hence under $(\mathsf{P})$, $m \in \mathsf{anc}_g(n) \Leftrightarrow \mathrm{Anc
 The pigeonhole content is (iii)--(iv): a saturation that kept discovering new nodes after $N+1$ rounds would hold $N+1$ distinct declared nodes, more than the graph contains. The bound $N$ is used in the definition of $\mathsf{anc}_g$; only $(\mathsf{P})$ is needed, not acyclicity, which is itself checked below.
 
 \subsection{Reflected conditions}
-Define the Boolean checks: $\mathsf{wf}_1,\dots,\mathsf{wf}_4$ (clauses (1)--(4) of $\mathsf{WF}$, by list computation), $\mathsf{cycle}(g) = $ the first $n \in \mathsf{nodes}(g)$ with $n \in \mathsf{anc}_g(n)$; $\mathsf{c}_1$: $d_A,d_B \notin \mathsf{anc}_g(\gamma)$; $\mathsf{c}_2$: every $n \in \mathsf{anc}_g(d_A)$ with $n \in \mathsf{anc}_g(d_B)$ and $n \notin \mathit{Raw}$ is in $\mathsf{dom}(\Delta)$; $\mathsf{c}_3$: some $n \in \mathsf{anc}_g(\gamma)$ has $n \in \mathit{Raw} \cap \mathit{Rel}$, $n \notin \mathsf{anc}_g(d_A) \cup \mathsf{anc}_g(d_B)$, $n \neq d_A, d_B$.
+Define the Boolean checks: $\mathsf{wf}_1,\dots,\mathsf{wf}_4$ (clauses (1)--(4) of $\mathsf{WF}$, by list computation), $\mathsf{cycle}(g) = $ the first $n \in \mathsf{nodes}(g)$ with $n \in \mathsf{anc}_g(n)$; $\mathsf{c}_1$: $\gamma \neq d_A$, $\gamma \neq d_B$ and $d_A,d_B \notin \mathsf{anc}_g(\gamma)$; $\mathsf{c}_2$: every $n \in \mathsf{anc}_g(d_A)$ with $n \in \mathsf{anc}_g(d_B)$ and $n \notin \mathit{Raw}$ is in $\mathsf{dom}(\Delta)$; $\mathsf{c}_3$: some $n \in \{\gamma\} \cup \mathsf{anc}_g(\gamma)$ has $n \in \mathit{Raw} \cap \mathit{Rel}$, $n \notin \mathsf{anc}_g(d_A) \cup \mathsf{anc}_g(d_B)$, $n \neq d_A, d_B$.
 \begin{lem}[Reflection of the conditions]\label{lem:reflect}
 Each $\mathsf{wf}_i$ reflects clause $(i)$ of $\mathsf{WF}$, $i \le 4$. Under $(\mathsf{P})$, $\mathsf{c}_1 \Leftrightarrow \mathrm{L1}$, $\mathsf{c}_2 \Leftrightarrow \mathrm{L2}$ and $\mathsf{c}_3 \Leftrightarrow \mathrm{L3}$. \emph{(Coq: \coq{wf_defect_none_iff}, \coq{check_L1_reflect}, \coq{undisclosed_none_iff}, \coq{check_L3_reflect}.)}
 \end{lem}
 \begin{proof}
-The first four are direct list facts (membership and duplicate-freedom are decided by traversal). For the rest, replace $\mathsf{anc}_g$ by $\mathrm{Anc}_g$ using \cref{thm:anc} (both directions, under $(\mathsf{P})$); each check then states its condition verbatim.
+The first four are direct list facts (membership and duplicate-freedom are decided by traversal). For the rest, replace $\mathsf{anc}_g$ by $\mathrm{Anc}_g$ using \cref{thm:anc} (both directions, under $(\mathsf{P})$); the identity tests of $\mathsf{c}_1$ are equalities of natural numbers, and membership in $\{\gamma\} \cup \mathsf{anc}_g(\gamma)$ becomes $n = \gamma \lor \mathrm{Anc}_g(\gamma,n)$. Each check then states its condition verbatim.
 \end{proof}
 
 \subsection{Unconditional reflection}
-The audit returns the first defect found, in the order: well-formedness (duplicate, undeclared parent, distinguished node not derived, relevant input not raw, cycle), then L1 (descent from $d_A$, then from $d_B$), L2 (undisclosed shared ancestor), L3 (no independent source). Let $\mathsf{defect}(g) \in \mathsf{Option}(\text{Defect})$ be this result. Then
+The audit returns the first defect found, in the order: well-formedness (duplicate, undeclared parent, coordinate not derived or ground not declared, relevant input not raw, cycle), then L1 (ground equal to $d_A$, then to $d_B$, then descent from $d_A$, then from $d_B$), L2 (undisclosed shared ancestor), L3 (no independent source). Let $\mathsf{defect}(g) \in \mathsf{Option}(\text{Defect})$ be this result. Then
 \[
 \mathsf{lineageCheck}(g,\varkappa) \;=\;
 \begin{cases}
@@ -86,10 +88,10 @@ The theorem needs no well-formedness hypothesis, unlike the conditional form one
 
 \subsection{Rejected and open outcomes}
 \begin{prop}[Rejection evidence]\label{prop:rejection}
-If $\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Rejected}(d)$ then the specification is violated in the way $d$ says, and $\neg\,\mathsf{LineagePasses}(g)$: a duplicate node, an undeclared parent, a distinguished node that is not derived, or a non-raw relevant input violates the corresponding clause of $\mathsf{WF}$; $\mathsf{Cycle}(n)$ gives $\mathrm{Anc}_g(n,n)$; $\mathsf{DescentFromA}$ (resp.\ $B$) gives $\mathrm{Anc}_g(\gamma,d_A)$ (resp.\ $d_B$); $\mathsf{UndisclosedShared}(n)$ gives $\mathrm{Anc}_g(d_A,n) \wedge \mathrm{Anc}_g(d_B,n) \wedge n \notin \mathit{Raw} \wedge n \notin \mathsf{dom}(\Delta)$; $\mathsf{NoIndependentSource}$ gives $\neg\mathrm{L3}$. \emph{(Coq: \coq{defect_sound}, \coq{lineage_check_rejected}.)}
+If $\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Rejected}(d)$ then the specification is violated in the way $d$ says, and $\neg\,\mathsf{LineagePasses}(g)$: a duplicate node, an undeclared parent, a coordinate that is not derived or a ground that is not a declared node, or a non-raw relevant input violates the corresponding clause of $\mathsf{WF}$; $\mathsf{Cycle}(n)$ gives $\mathrm{Anc}_g(n,n)$; $\mathsf{GroundEqualsA}$ (resp.\ $B$) gives $\gamma = d_A$ (resp.\ $\gamma = d_B$); $\mathsf{DescentFromA}$ (resp.\ $B$) gives $\mathrm{Anc}_g(\gamma,d_A)$ (resp.\ $d_B$); $\mathsf{UndisclosedShared}(n)$ gives $\mathrm{Anc}_g(d_A,n) \wedge \mathrm{Anc}_g(d_B,n) \wedge n \notin \mathit{Raw} \wedge n \notin \mathsf{dom}(\Delta)$; $\mathsf{NoIndependentSource}$ gives $\neg\mathrm{L3}$. \emph{(Coq: \coq{defect_sound}, \coq{lineage_check_rejected}.)}
 \end{prop}
 \begin{proof}
-Each defect is produced by exactly one failed check in a fixed order; \cref{lem:reflect} and \cref{thm:anc} convert the failed check into the stated fact. For $\mathsf{Cycle}(n)$: $n \in \mathsf{anc}_g(n)$ and \cref{thm:anc}(a). For descent and undisclosed ancestors, the same, since these are reported only after $\mathsf{WF}$ (hence $(\mathsf{P})$) has been established.
+Each defect is produced by exactly one failed check in a fixed order; \cref{lem:reflect} and \cref{thm:anc} convert the failed check into the stated fact. For $\mathsf{Cycle}(n)$: $n \in \mathsf{anc}_g(n)$ and \cref{thm:anc}(a). The identity defects are equalities of node numbers. For descent and undisclosed ancestors, the same, since these are reported only after $\mathsf{WF}$ (hence $(\mathsf{P})$) has been established.
 \end{proof}
 \begin{prop}[Open outcomes]\label{prop:openlineage}
 $\mathsf{lineageCheck}(g,\varkappa) = \mathsf{Open}(\mathit{gs})$ iff $\mathsf{LineagePasses}(g)$, $\mathsf{gaps}(\varkappa) = \mathit{gs}$ and $\mathit{gs} \neq [\,]$. In particular a defect takes precedence over a coverage gap. \emph{(Coq: \coq{lineage_check_open}.)}
@@ -107,6 +109,40 @@ There is a function $\mathsf{issue}(g,\varkappa) \in \mathsf{Option}(\mathsf{Lin
 Define $\mathsf{issue}$ by cases on $\mathsf{defect}(g)$ and $\mathsf{gaps}(\varkappa)$; in the accepting case build the record from $g$, $\varkappa$, the verdict $\mathsf{Pass}$, and the proofs of $\mathsf{WF}$, L1, L2, L3 supplied by \cref{lem:defectnone} and the empty gaps. The iff is \cref{thm:reflect}.
 \end{proof}
 Acceptance thus constructs a kernel-checked certificate. This is strictly stronger than an audit that prints a verdict: the extracted checker returns a value whose type records that the graph passes.
+
+\subsection{Pairwise audits do not compose}\label{sec:noncompose}
+For a fixed lineage graph and fixed ground, L1 composes across consecutive coordinate pairs. L2 and L3 do not compose in general. Pairwise accepted lineage audits therefore do not certify the outer coordinate pair.
+
+To state this without a composition operator on lineage records, fix every field of a record $g$ except the coordinates, and write $g[a,b]$ for $g$ with $d_A := a$ and $d_B := b$. The graph, the raw and claim-relevant inputs, the dispositions and the ground $\gamma$ are then the same in $g[A,B]$, $g[B,C]$ and $g[A,C]$, and so is $\mathrm{Anc}_g$, which depends only on $D$.
+
+\begin{prop}[Fixed-graph, fixed-ground composition of L1]\label{prop:l1compose}
+For every record $g$ and nodes $A,B,C$: if $g[A,B]$ and $g[B,C]$ satisfy L1, then so does $g[A,C]$. \emph{(Coq: \coq{L1_at_composes}.)}
+\end{prop}
+\begin{proof}
+L1 for $g[a,b]$ is the conjunction of $\gamma \neq a$, $\neg\mathrm{Anc}_g(\gamma,a)$, $\gamma \neq b$ and $\neg\mathrm{Anc}_g(\gamma,b)$. The two clauses for $A$ come from $g[A,B]$ and the two for $C$ from $g[B,C]$.
+\end{proof}
+No well-formedness hypothesis is used. The statement fixes the ground: it says nothing about a composite whose ground, or whose graph, differs from those of the local audits.
+
+\begin{prop}[L2 and L3 need not compose]\label{prop:noncompose}
+There are records $g_2$ and $g_3$, and nodes $A,B,C$ for each, such that $\mathsf{LineagePasses}(g_i[A,B])$ and $\mathsf{LineagePasses}(g_i[B,C])$ hold for $i = 2,3$, while $g_2[A,C]$ is well-formed and satisfies L1 and L3 but not L2, and $g_3[A,C]$ is well-formed and satisfies L1 and L2 but not L3. \emph{(Coq: \coq{disclosure_noncomposition}, \coq{source_noncomposition}.)}
+\end{prop}
+\begin{proof}
+Neither record has dispositions. Write $\mathsf{anc}(n)$ for the set of strict ancestors of $n$.
+
+In $g_2$ the raw inputs are $0,1,2,3$, with $3$ claim-relevant; the derived fields are $4$ with parent $0$, $5$ and $7$ with parent $4$, $6$ with parent $1$, and the ground $8$ with parent $3$; take $(A,B,C) = (5,6,7)$. Then $\mathsf{anc}(5) = \mathsf{anc}(7) = \{0,4\}$, $\mathsf{anc}(6) = \{1\}$ and $\mathsf{anc}(8) = \{3\}$. The ground differs from and descends from no coordinate, $3$ witnesses L3 for every pair, and the pairs $(5,6)$ and $(6,7)$ share no ancestor, so both consecutive records pass. The outer pair $(5,7)$ shares the non-raw ancestor $4$, which has no disposition, so L2 fails, while L1 and L3 hold as before.
+
+In $g_3$ the raw inputs are $0,1,2$, with $0$ and $1$ claim-relevant; the derived fields are $3$ with parent $1$, $4$ with parent $2$, $5$ with parent $0$, and the ground $6$ with parents $0$ and $1$; take $(A,B,C) = (3,4,5)$. No two coordinates share an ancestor, so L2 holds for every pair, and the ground differs from and descends from no coordinate, so L1 holds for every pair. For $(3,4)$ the input $0$ witnesses L3, and for $(4,5)$ the input $1$ does. For $(3,5)$ the only claim-relevant raw ancestors of the ground are $0$ and $1$, with $1 \in \mathsf{anc}(3)$ and $0 \in \mathsf{anc}(5)$, and the ground itself is not raw, so L3 fails.
+
+Well-formedness of the six records, and the checker's verdicts (accepted for the consecutive pairs; $\mathsf{UndisclosedShared}(4)$ and $\mathsf{NoIndependentSource}$ for the two outer pairs), are established by computation and \cref{thm:reflect}.
+\end{proof}
+
+\begin{cor}[Fresh outer audit]\label{cor:freshaudit}
+In general, lineage certificates for $g[A,B]$ and $g[B,C]$ do not yield one for $g[A,C]$: for the records of \cref{prop:noncompose}, the first two exist and the third does not. A lineage certificate for the outer pair therefore requires a fresh audit of that pair.
+\end{cor}
+\begin{proof}
+A lineage certificate carries proofs of well-formedness and L1--L3 for its graph (\cref{def:certs}), so none exists for $g_i[A,C]$. For the consecutive records, with empty gaps, \cref{thm:issue} issues one.
+\end{proof}
+Composition of witnesses (\cref{thm:refl}) stays within one transport problem, and so under one lineage record. The outer pair $g[A,C]$ is a different record, which is why it needs its own audit.
 
 \subsection{What the reflection theorem does not prove}
 It proves equivalence between the Coq checker and the Coq specification. It does \emph{not} prove that the extracted checker agrees with an arbitrary handwritten implementation at the source-language semantic level; extraction remains within the stated trust boundary, and agreement with a handwritten audit is evidence of a different kind (\cref{sec:mechanisation}). Nor does it show that the declared graph contains every real production path.

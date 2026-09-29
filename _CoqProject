@@ -32,6 +32,7 @@ theories/Instances/OriginalAdmissibility.v
 theories/Instances/OriginalDynamicSeamInstance.v
 examples/LineageCertificates.v
 examples/LineageChecked.v
+examples/LineageNonComposition.v
 examples/CopiedCoordinates.v
 examples/EvolutionCoverage.v
 examples/DifferentWarrants.v

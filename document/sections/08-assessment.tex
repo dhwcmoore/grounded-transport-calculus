@@ -20,6 +20,7 @@ Observation & fibre witness ($A$ or $B$) & $\Adm(M,\Phi)$ & data: states $s_1,s_
 Construction & empty seam & $\mathsf{Inh}(\Sigma)$ & --- \\
  & grounding failure & $\mathsf{GE}$ & data: seam element $r$; proof: which equation fails \\
  & exhibition defeated & $\mathsf{Inh}(\mathsf{Exh}(c))$ & --- \\
+ & coordinate-ground identity & L1 & proof: the ground node equals a coordinate node (tag only after extraction) \\
  & lineage descent & L1 & proof: an ancestor derivation from a coordinate to the ground (tag only after extraction) \\
  & undisclosed shared ancestor & L2 & data: the node $n$; proof: it is a shared, non-raw, undispositioned ancestor \\
  & no independent source & L3 & --- \\
@@ -88,7 +89,7 @@ By \cref{def:assembly}, $\kappa$ is built from four discharged component verdict
 \emph{(Coq: \coq{located_refutes_legacy}, \coq{institutional_refutes_full}, \coq{located_refutes_transportable}, \coq{refuted_not_transportable}, \coq{located_refutes}, \coq{obstructions_refute}, \coq{each_obstruction_refutes}.)}
 \end{prop}
 \begin{proof}
-(a) Assume $\Tr_{\mathrm{leg}}(c)$ and case on $f$ (\cref{tab:failures}). A fibre witness contradicts admissibility: if $\Phi = h \circ M$ and $M s_1 = M s_2$ then $\Phi s_1 = h(M s_1) = h(M s_2) = \Phi s_2$, contradicting $\Phi s_1 \neq \Phi s_2$. An empty seam contradicts $\mathsf{Inh}(\Sigma)$; a grounding failure at $r$ contradicts the grounding equation at $r$; a defeated exhibition contradicts $\mathsf{Inh}(\mathsf{Exh}(c))$; lineage descent, an undisclosed shared ancestor, the absence of an independent source, and a malformed record contradict, respectively, L1, L2, L3 and well-formedness, all components of $\mathsf{LineagePasses}(\ell)$. A maintenance failure contradicts $\mathsf{Inh}(\mathrm{Mnt})$ by the refutation function of \cref{def:problem}. Since $\Tr(c)$ implies $\Tr_{\mathrm{leg}}(c)$, $\neg\Tr_{\mathrm{leg}}(c)$ gives $\neg\Tr(c)$.
+(a) Assume $\Tr_{\mathrm{leg}}(c)$ and case on $f$ (\cref{tab:failures}). A fibre witness contradicts admissibility: if $\Phi = h \circ M$ and $M s_1 = M s_2$ then $\Phi s_1 = h(M s_1) = h(M s_2) = \Phi s_2$, contradicting $\Phi s_1 \neq \Phi s_2$. An empty seam contradicts $\mathsf{Inh}(\Sigma)$; a grounding failure at $r$ contradicts the grounding equation at $r$; a defeated exhibition contradicts $\mathsf{Inh}(\mathsf{Exh}(c))$; a coordinate-ground identity and a lineage descent contradict L1, and an undisclosed shared ancestor, the absence of an independent source, and a malformed record contradict, respectively, L2, L3 and well-formedness, all components of $\mathsf{LineagePasses}(\ell)$. A maintenance failure contradicts $\mathsf{Inh}(\mathrm{Mnt})$ by the refutation function of \cref{def:problem}. Since $\Tr(c)$ implies $\Tr_{\mathrm{leg}}(c)$, $\neg\Tr_{\mathrm{leg}}(c)$ gives $\neg\Tr(c)$.
 (b) An authority failure contradicts $\mathsf{Inh}(\mathrm{Aut})$ by the refutation function of \cref{def:problem}, hence $\Tr(c)$. It says nothing about the conjuncts of $\Tr_{\mathrm{leg}}(c)$, none of which mentions authority; so this argument cannot refute the legacy predicate, and we do not claim it does.
 (c) Combine (a) and (b). Since $\mathsf{Cert}(c)$ erases into $\Tr(c)$ by \cref{prop:certsound}, $\mathsf{Cert}(c) = \emptyset$. The final clauses apply (a) to a non-institutional member of $F$.
 \end{proof}

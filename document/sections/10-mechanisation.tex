@@ -1,7 +1,7 @@
 \section{Mechanisation and regression evidence}\label{sec:mechanisation}
 
 \subsection{Verified build}
-The development is in Coq 8.18.0 \cite{coq818} and comprises roughly three and a half thousand lines of theory and nine hundred of examples. It builds with \texttt{coq\_makefile} and with \texttt{dune build}; \texttt{coqchk} succeeds on the whole project excluding one isolated file; and \texttt{Print Assumptions} reports each of the 120 Coq identifiers cited in this paper (92 of them in the ledger of \cref{app:ledger}) as closed under the global context. The one exception by design is the unrestricted functional converse of fibre factorisation, which needs classical choice and is confined to a single file that nothing else imports. Its constructive replacements are the relational form and, for finite domains with decidable equality, a direct construction. The main dependency closure is therefore axiom-free. \Cref{tab:trust} summarises the trust boundary.
+The development is in Coq 8.18.0 \cite{coq818} and comprises roughly three and a half thousand lines of theory and twelve hundred of examples. It builds with \texttt{coq\_makefile} and with \texttt{dune build}; \texttt{coqchk} succeeds on the whole project excluding one isolated file; and \texttt{Print Assumptions} reports each of the 123 Coq identifiers cited in this paper (95 of them in the ledger of \cref{app:ledger}) as closed under the global context. The one exception by design is the unrestricted functional converse of fibre factorisation, which needs classical choice and is confined to a single file that nothing else imports. Its constructive replacements are the relational form and, for finite domains with decidable equality, a direct construction. The main dependency closure is therefore axiom-free. \Cref{tab:trust} summarises the trust boundary.
 \begin{table}[t]
 \centering\small
 \caption{Trust boundary and non-claims.}\label{tab:trust}
@@ -9,7 +9,7 @@ The development is in Coq 8.18.0 \cite{coq818} and comprises roughly three and a
 \toprule
 Checked mechanically & the theorems of this paper, in the Coq kernel; axiom-freeness of the main closure. \\
 Trusted & the Coq kernel and extraction mechanism; the encoding of $\nat$ as OCaml integers in extracted code; the declared records themselves. \\
-Tested, not proved & agreement of the extracted lineage audit with a handwritten audit (\cref{sec:regression}). \\
+Tested, not proved & agreement of the extracted lineage audit with a handwritten audit on the legacy overlap, and its verdicts on the edge cases of the current conditions (\cref{sec:regression}). \\
 Not established & completeness of declared lineage; accuracy of raw inputs; adequacy of the state model; legitimacy or competence of an authority; decidability of general obligations. \\
 \bottomrule
 \end{tabularx}
@@ -50,42 +50,49 @@ The extracted checker (\cref{sec:lineage}) was compared with a handwritten OCaml
 \paragraph{Case study.}
 On five case-study records (live rows; backfill with a disclosed shared ancestor; backfill with it undisclosed; a copied seam valuation; a cyclic record) the two agree on all five, including the malformed cycle.
 
-\paragraph{Unrestricted random records.}
-On 3000 random records, including every malformation kind, they agree on all 3000. Only 89 of these were grounded, 1403 not grounded, 1508 malformed; the random population exercises the rejecting paths much more than the accepting path.
+\paragraph{Random records on the legacy overlap.}
+The handwritten audit belongs to the unchanged earlier supplement, so it predates the ground-identity clauses and the directly raw ground (\cref{def:L}). The random differential is therefore restricted to the harness-defined \emph{legacy overlap}: records in which the ground differs from both coordinates and is not a purely raw node. On this domain, inspection of the definitions shows that the ground-identity and directly-raw-ground clauses are inactive. Of 3000 generated records, including every malformation kind, 1921 lie in the overlap, and the two audits agree on all 1921; the other 1079 are skipped rather than resampled. This agreement is regression evidence consistent with that comparison of the definitions; it is not a proof that the two implementations are semantically equivalent. Of the 1921, 89 are grounded, 846 not grounded and 986 malformed, so the random population exercises the rejecting paths much more than the accepting path.
 
 \paragraph{Stratified populations.}
-To remedy this, we generate separate populations, each with a known \emph{intended} outcome. A graph passes only if (i) the extracted checker's verdict matches the intent, and (ii) its L1--L3 flags match the handwritten audit's output. The eleven \emph{shallow} populations, of 300 graphs each, are: accepted graphs (with random shared ancestry, dispositions and shuffled order); the same graphs with a coverage gap, intended $\mathsf{Open}$; one family for each single defect (descent from $d_A$, descent from $d_B$, undisclosed shared ancestor, no independent source); and one for each malformation (duplicate name, undeclared parent, distinguished node not derived, relevant input not raw, cycle). The handwritten audit has no notion of coverage, so the open population is checked against the intent and against the handwritten flags on the underlying graph.
+To remedy this, we generate separate populations, each with a known \emph{intended} outcome. A graph passes only if (i) the extracted checker's verdict matches the intent, and (ii) its L1--L3 flags match the handwritten audit's output. The eleven \emph{shallow} populations, of 300 graphs each, are: accepted graphs (with random shared ancestry, dispositions and shuffled order); the same graphs with a coverage gap, intended $\mathsf{Open}$; one family for each single defect (descent from $d_A$, descent from $d_B$, undisclosed shared ancestor, no independent source); and one for each malformation (duplicate name, undeclared parent, distinguished node not declared as clause (3) of $\mathsf{WF}$ requires, relevant input not raw, cycle). The handwritten audit has no notion of coverage, so the open population is checked against the intent and against the handwritten flags on the underlying graph.
 
 \paragraph{Deep-ancestry populations.}
 The mutation study below showed that the shallow populations are too shallow: their ancestor chains are short, so a saturation that stops early still finds every decisive ancestor. We therefore added six \emph{deep} populations of 300 graphs, in which the decisive ancestor is reachable only after several saturation rounds: the ground reaches its independent raw source through a chain of three to five derived nodes (depth at least four); descent from $d_A$ or $d_B$ is through a three-node branch (depth four); a shared derived ancestor is reached through chains of two to four nodes from each coordinate. The six populations are: accepted (L3 source at depth $\ge 4$), the same with a coverage gap ($\mathsf{Open}$), deep descent from $d_A$, deep descent from $d_B$, deep undisclosed shared ancestor, and deep no-independent-source. Together the seventeen populations comprise 5100 graphs, and all pass both criteria.
 
+\paragraph{Edge cases of the current conditions.}
+The legacy overlap is defined to exclude the records on which the ground-identity and directly-raw-ground clauses act, and the stratified populations do not exercise those clauses either (\cref{tab:mutants}). Six fixed cases test them against intended verdicts: grounds equal to $d_A$ and to $d_B$ are each rejected and receive no certificate, and a directly raw, claim-relevant ground is accepted and receives a certificate. All six pass.
+
 \paragraph{Mutation study.}
-A test is only as good as its ability to fail. We textually mutated the \emph{extracted} checker in thirteen ways and recorded which suite detects each (\cref{tab:mutants}): the five-record case study (fixed), the unrestricted random population, the eleven shallow stratified populations, and the six deep populations.
+A test is only as good as its ability to fail. We textually mutated the \emph{extracted} checker in seventeen ways and recorded which suite detects each (\cref{tab:mutants}): the five-record case study (fixed), the random population on the legacy overlap, the eleven shallow stratified populations, the six deep populations, and the six edge cases (edge). Mutants M14 to M17 alter only the clauses on which the current conditions differ from the earlier ones.
 \begin{table}[t]
 \centering\small
 \caption{Mutation study of the extracted lineage checker: $\times$ means the suite detects the mutant.}\label{tab:mutants}
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-Mutant & fixed & random & shallow & deep \\
+Mutant & fixed & random & shallow & deep & edge \\
 \midrule
-M1 drop the $d_B$ descent test (L1) & & $\times$ & $\times$ & $\times$ \\
-M2 ignore dispositions (L2) & $\times$ & $\times$ & $\times$ & $\times$ \\
-M3 raw shared ancestors count as undisclosed (L2) & $\times$ & $\times$ & $\times$ & $\times$ \\
-M4 source need not be claim-relevant (L3) & & $\times$ & $\times$ & $\times$ \\
-M5 source may be an ancestor of $d_A$ (L3) & & $\times$ & $\times$ & \\
-M6 coverage gaps ignored & & & $\times$ & $\times$ \\
-M7 skip relevance-is-raw check (WF) & & $\times$ & $\times$ & \\
-M8 skip cycle detection (WF) & $\times$ & $\times$ & $\times$ & \\
-M9 skip distinguished-derived check (WF) & & $\times$ & $\times$ & \\
-M10 skip declared-parents check (WF) & & $\times$ & $\times$ & \\
-M11 ancestors: parents only & $\times$ & $\times$ & $\times$ & $\times$ \\
-M12 ancestors: one saturation step & $\times$ & $\times$ & & $\times$ \\
-M13 ancestors: two saturation steps & & $\times$ & & $\times$ \\
+M1 drop the $d_B$ descent test (L1) & & $\times$ & $\times$ & $\times$ & \\
+M2 ignore dispositions (L2) & $\times$ & $\times$ & $\times$ & $\times$ & \\
+M3 raw shared ancestors count as undisclosed (L2) & $\times$ & $\times$ & $\times$ & $\times$ & \\
+M4 source need not be claim-relevant (L3) & & $\times$ & $\times$ & $\times$ & \\
+M5 source may be an ancestor of $d_A$ (L3) & & $\times$ & $\times$ & & \\
+M6 coverage gaps ignored & & & $\times$ & $\times$ & \\
+M7 skip relevance-is-raw check (WF) & & $\times$ & $\times$ & & \\
+M8 skip cycle detection (WF) & $\times$ & $\times$ & $\times$ & & \\
+M9 skip distinguished-derived check (WF) & & $\times$ & $\times$ & & \\
+M10 skip declared-parents check (WF) & & $\times$ & $\times$ & & \\
+M11 ancestors: parents only & $\times$ & $\times$ & $\times$ & $\times$ & \\
+M12 ancestors: one saturation step & $\times$ & $\times$ & & $\times$ & \\
+M13 ancestors: two saturation steps & & $\times$ & & $\times$ & \\
+M14 omit $\gamma \neq d_A$ (L1) & & & & & $\times$ \\
+M15 omit $\gamma \neq d_B$ (L1) & & & & & $\times$ \\
+M16 exclude $\gamma$ from the L3 candidates & & & & & $\times$ \\
+M17 require $\gamma$ to be derived (WF) & & & & & $\times$ \\
 \midrule
-Mutants detected (of 13) & 5 & 12 & 11 & 8 \\
+Mutants detected (of 17) & 5 & 12 & 11 & 8 & 4 \\
 \bottomrule
 \end{tabular}
 \end{table}
-All thirteen mutants are detected by the union of the suites, and by the stratified suite (shallow and deep together) alone. The individual suites are not equivalent, which is the argument for stratification. The random population detects twelve but misses M6, since the handwritten audit has no coverage; M6 is caught only by the open populations. The shallow populations detect eleven, and \emph{miss} the bounded-saturation mutants M12 and M13, because their graphs are shallow; the unrestricted random population detected those two because it happens to generate deeper graphs; and the deep populations, added in response, detect both. The fixed case study detects five and would not have found, for instance, the dropped $d_B$ descent test (M1).
+All seventeen mutants are detected by the union of the suites. The stratified suite (shallow and deep together) alone detects the first thirteen but none of M14 to M17, which only the edge cases detect. The individual suites are not equivalent, which is the argument for stratification and for the edge cases. The random population detects twelve: it misses M6, since the handwritten audit has no coverage, and M14 to M17, since the legacy overlap excludes the records on which they act; M6 is caught only by the open populations. The shallow populations detect eleven, and \emph{miss} the bounded-saturation mutants M12 and M13, because their graphs are shallow; the unrestricted random population detected those two because it happens to generate deeper graphs; and the deep populations, added in response, detect both. The fixed case study detects five and would not have found, for instance, the dropped $d_B$ descent test (M1).
 
 The theorem of \cref{sec:lineage} already establishes checker correctness. These tests probe extraction, the encoding of records, the differential harness, and diagnostic agreement with the handwritten implementation; the mutation study measures whether that probe can fail.
