@@ -1,16 +1,16 @@
 \section{Mechanisation and regression evidence}\label{sec:mechanisation}
 
 \subsection{Verified build}
-The development is in Coq 8.18.0 \cite{coq818} and comprises roughly three and a half thousand lines of theory and twelve hundred of examples. It builds with \texttt{coq\_makefile} and with \texttt{dune build}; \texttt{coqchk} succeeds on the whole project excluding one isolated file; and \texttt{Print Assumptions} reports each of the 123 Coq identifiers cited in this paper (95 of them in the ledger of \cref{app:ledger}) as closed under the global context. The one exception by design is the unrestricted functional converse of fibre factorisation, which needs classical choice and is confined to a single file that nothing else imports. Its constructive replacements are the relational form and, for finite domains with decidable equality, a direct construction. The main dependency closure is therefore axiom-free. \Cref{tab:trust} summarises the trust boundary.
+The development is in Coq 8.18.0 \cite{coq818} and comprises roughly three and a half thousand lines of theory and twelve hundred of examples. It builds with \texttt{coq\_makefile} and with \texttt{dune build}; \texttt{coqchk} succeeds on the whole project excluding one isolated file; and \texttt{Print Assumptions} reports each of the 123 Coq identifiers cited in this paper (95 of them in the ledger of \cref{app:ledger}) as closed under the global context. Separately, the cited \coq{constant_factors} is the unrestricted functional converse of fibre factorisation, which needs classical choice and is confined to a single file that nothing else imports. Its constructive replacements are the relational form and, for finite domains with decidable equality, a direct construction. The main dependency closure is therefore axiom-free. \Cref{tab:trust} summarises the trust boundary.
 \begin{table}[t]
 \centering\small
 \caption{Trust boundary and non-claims.}\label{tab:trust}
 \begin{tabularx}{\textwidth}{@{}lY@{}}
 \toprule
 Checked mechanically & the theorems of this paper, in the Coq kernel; axiom-freeness of the main closure. \\
-Trusted & the Coq kernel and extraction mechanism; the encoding of $\nat$ as OCaml integers in extracted code; the declared records themselves. \\
+Trusted & the Coq kernel and extraction mechanism; OCaml compilation and execution; non-negative, machine-bounded integer encodings and intermediate arithmetic; the declared records themselves. \\
 Tested, not proved & agreement of the extracted lineage audit with a handwritten audit on the legacy overlap, and its verdicts on the edge cases of the current conditions (\cref{sec:regression}). \\
-Not established & completeness of declared lineage; accuracy of raw inputs; adequacy of the state model; legitimacy or competence of an authority; decidability of general obligations. \\
+Not established & actual coverage or completeness of declared lineage; accuracy of raw inputs; resolution of disclosed open defeaters; L4; adequacy of the state model; legitimacy or competence of an authority; decidability of general obligations. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -93,6 +93,6 @@ Mutants detected (of 17) & 5 & 12 & 11 & 8 & 4 \\
 \bottomrule
 \end{tabular}
 \end{table}
-All seventeen mutants are detected by the union of the suites. The stratified suite (shallow and deep together) alone detects the first thirteen but none of M14 to M17, which only the edge cases detect. The individual suites are not equivalent, which is the argument for stratification and for the edge cases. The random population detects twelve: it misses M6, since the handwritten audit has no coverage, and M14 to M17, since the legacy overlap excludes the records on which they act; M6 is caught only by the open populations. The shallow populations detect eleven, and \emph{miss} the bounded-saturation mutants M12 and M13, because their graphs are shallow; the unrestricted random population detected those two because it happens to generate deeper graphs; and the deep populations, added in response, detect both. The fixed case study detects five and would not have found, for instance, the dropped $d_B$ descent test (M1).
+All seventeen mutants are detected by the union of the suites. The stratified suite (shallow and deep together) alone detects the first thirteen but none of M14 to M17, which only the edge cases detect. The individual suites are not equivalent, which is the argument for stratification and for the edge cases. The random population detects twelve: it misses M6, since the handwritten audit has no coverage, and M14 to M17, since the legacy overlap excludes the records on which they act; M6 is caught only by the open populations. The shallow populations detect eleven, and \emph{miss} the bounded-saturation mutants M12 and M13, because their graphs are shallow; the legacy-overlap random sample detected those two because it happens to generate deeper graphs; and the deep populations, added in response, detect both. The fixed case study detects five and would not have found, for instance, the dropped $d_B$ descent test (M1).
 
 The theorem of \cref{sec:lineage} already establishes checker correctness. These tests probe extraction, the encoding of records, the differential harness, and diagnostic agreement with the handwritten implementation; the mutation study measures whether that probe can fail.

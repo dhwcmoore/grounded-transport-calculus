@@ -1,0 +1,18 @@
+UTC start: 2026-10-02T21:12:41.928923+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/assessment
+Command: ['./inspect']
+
+copied                       Refuted [Construction(LineageDescent)]
+copied, lineage missing      Open, 1 obligation(s)
+copied, lineage partial      Open, 1 obligation(s)
+maintenance lost             Refuted [Maintenance]
+maintenance unassessed       Open, 1 obligation(s)
+copied + maintenance lost    Refuted [Construction(LineageDescent); Maintenance]
+grounded, preserved          Certified (evidence attached)
+certified evidence: custodian=7 record=1 lineage ground node=5 verdict=LineagePass
+w1 {record=1 custodian=7 coverage=(0,1) dispositions=0}
+w2 {record=2 custodian=8 coverage=(0,5) dispositions=0}
+w3 {record=1 custodian=7 coverage=(0,1) dispositions=1}
+
+Exit status: 0
+UTC finish: 2026-10-02T21:12:41.931022+00:00

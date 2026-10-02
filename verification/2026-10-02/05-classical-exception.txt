@@ -1,0 +1,11 @@
+UTC start: 2026-10-02T21:08:19.029035+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['coqc', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/legacy/exactness-2026', 'Exactness', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/theories', 'GTC', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/examples', 'GTCExamples', '/workspace/scratch/7377e5310b4a/verification/ClassicalAssumptions.v']
+
+Axioms:
+ClassicalEpsilon.constructive_indefinite_description
+  : forall (A : Type) (P : A -> Prop), (exists x : A, P x) -> {x : A | P x}
+Classical_Prop.classic : forall P : Prop, P \/ ~ P
+
+Exit status: 0
+UTC finish: 2026-10-02T21:08:19.208958+00:00

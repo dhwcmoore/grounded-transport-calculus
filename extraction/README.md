@@ -54,3 +54,22 @@ WORK=$(mktemp -d)
 extraction/run_lineage_regression.sh "$WORK"
 python3 extraction/mutation_matrix.py "$WORK"
 ```
+
+## Issuance and execution boundary
+
+`issue_certificate` builds a proof-bearing record in Coq; extraction retains data
+and erases proofs. Issuance requires WF, L1--L3 and an empty declared gap list.
+A `Justified` or `OpenDefeater` entry satisfies disclosure by membership;
+resolution and disposition-key validation are not checked. Actual coverage,
+source accuracy and L4 remain outside the checker.
+
+`ExtrOcamlNatInt` requires non-negative encodings and identifiers, counters and
+all intermediate arithmetic within OCaml machine-integer range. The extraction
+mechanism, compiler, runtime and input encoding are trusted. The assessment
+consumer uses `Obj.magic` for dummy endpoints in its witness-summary calls;
+that demonstration is not a coercion-free sealed-interface guarantee.
+
+The current mutation union detects 17/17. Fixed, random, shallow, deep and edge
+suites detect 5, 12, 11, 8 and 4 respectively; shallow and deep together detect
+13, and M14--M17 are detected only by edge cases. These are test outcomes,
+not additional proofs of semantic equivalence or production fidelity.

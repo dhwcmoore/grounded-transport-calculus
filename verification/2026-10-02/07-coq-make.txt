@@ -1,0 +1,60 @@
+UTC start: 2026-10-02T21:08:19.214169+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['make', '-f', 'Makefile.coq', '-j2']
+
+COQDEP VFILES
+COQC legacy/exactness-2026/Admissibility.v
+COQC legacy/exactness-2026/GroundedSeam.v
+Closed under the global context
+Closed under the global context
+COQC theories/Core/GroundedTransport.v
+COQC theories/Obstructions/FibreObstruction.v
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+COQC theories/Core/Erasure.v
+COQC theories/Contexts/GroundedProper.v
+COQC theories/Obstructions/ClassicalFactorisation.v
+COQC theories/Obstructions/LineageObstruction.v
+COQC theories/Obstructions/UngroundedAgreement.v
+COQC theories/Debt/WarrantDebt.v
+COQC theories/Debt/Certificates.v
+COQC theories/Instances/OriginalGroundedSeamInstance.v
+COQC theories/Instances/OriginalAdmissibility.v
+COQC examples/SeamTransport.v
+COQC theories/Core/Composition.v
+COQC theories/Contexts/ContextualPreservation.v
+COQC theories/Debt/DebtClassifier.v
+COQC theories/Debt/OriginalObligations.v
+COQC theories/Debt/LineageCheck.v
+COQC theories/Debt/Assessment.v
+COQC theories/Instances/OriginalDynamicSeamInstance.v
+COQC theories/Debt/EvidenceObligations.v
+COQC theories/Instances/ExtensionalSeam.v
+COQC examples/LineageCertificates.v
+COQC examples/LineageNonComposition.v
+COQC examples/EvolutionCoverage.v
+COQC theories/Debt/MaintenanceDebt.v
+COQC theories/Debt/GroundedWitness.v
+COQC examples/LineageChecked.v
+COQC theories/Debt/TransportAssessment.v
+COQC theories/Debt/PackedWarrant.v
+COQC theories/Debt/CertificateProper.v
+COQC examples/DifferentWarrants.v
+COQC theories/Debt/LineageAssessment.v
+COQC examples/CopiedCoordinates.v
+COQC examples/MaintenanceFailure.v
+COQC examples/CertificateReissue.v
+evolution_crossing_proper Vok e01 ok_preserves
+     : CrossingProper (sp sys false) (vA Vok false) 
+         (vB Vok false) (vS Vok false) (sp sys true) 
+         (vA Vok true) (vB Vok true) (vS Vok true) 
+         (evo_state e01)
+
+Exit status: 0
+UTC finish: 2026-10-02T21:08:24.202216+00:00

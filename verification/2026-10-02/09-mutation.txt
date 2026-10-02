@@ -1,0 +1,36 @@
+UTC start: 2026-10-02T21:09:56.615527+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['python3', '/workspace/scratch/7377e5310b4a/verification/pinned-source/extraction/mutation_matrix.py', '/workspace/scratch/7377e5310b4a/verification/regression']
+
+| mutant | fixed | random | shallow strat. | deep strat. | v6 edge |
+|---|:-:|:-:|:-:|:-:|:-:|
+| M1  drop the d_B descent test (L1) | . | x | x | x | . |
+| M2  ignore dispositions (L2) | x | x | x | x | . |
+| M3  count raw shared ancestors as undisclosed (L2) | x | x | x | x | . |
+| M4  source need not be claim-relevant (L3) | . | x | x | x | . |
+| M5  source may be an ancestor of d_A (L3) | . | x | x | . | . |
+| M6  coverage gaps ignored (open becomes accepted) | . | . | x | x | . |
+| M7  skip relevance-is-raw check (WF) | . | x | x | . | . |
+| M8  skip cycle detection (WF) | x | x | x | . | . |
+| M9  skip distinguished-derived check (WF) | . | x | x | . | . |
+| M10 skip declared-parents check (WF) | . | x | x | . | . |
+| M11 ancestors: parents only (no saturation) | x | x | x | x | . |
+| M12 ancestors: one saturation step only | x | x | . | x | . |
+| M13 ancestors: two saturation steps only | . | x | . | x | . |
+| M14 omit ground != d_A (L1) | . | . | . | . | x |
+| M15 omit ground != d_B (L1) | . | . | . | . | x |
+| M16 exclude ground itself from L3 candidates | . | . | . | . | x |
+| M17 require ground to be derived again (WF) | . | . | . | . | x |
+
+total mutants: 17
+detected by the union of all suites: 17/17
+detected by the stratified suite alone (shallow + deep): 13/17
+detected by shallow-stratified alone: 11/17
+detected by deep-stratified alone: 8/17
+detected by random alone: 12/17
+detected by fixed case study alone: 5/17
+detected by v6 edge suite alone: 4/17
+detected only by v6 edge suite: ['M14 omit ground != d_A (L1)', 'M15 omit ground != d_B (L1)', 'M16 exclude ground itself from L3 candidates', 'M17 require ground to be derived again (WF)']
+
+Exit status: 0
+UTC finish: 2026-10-02T21:12:41.647048+00:00

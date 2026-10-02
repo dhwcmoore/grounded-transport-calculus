@@ -1,0 +1,9 @@
+UTC start: 2026-10-02T21:08:24.202608+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['sh', '/workspace/scratch/7377e5310b4a/verification/pinned-source/extraction/run_lineage_regression.sh', '/workspace/scratch/7377e5310b4a/verification/regression']
+
+run_lineage_regression: compiled libraries from /workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default
+ocamlfind: /usr/lib/ocaml/ld.conf: No such file or directory
+
+Exit status: 2
+UTC finish: 2026-10-02T21:08:24.452097+00:00

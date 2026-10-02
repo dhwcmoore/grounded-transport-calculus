@@ -7,11 +7,13 @@
 
         concrete certificate  ->  grounded transport witness  ->  erased relation
 
-    SCOPE.  Certificates are ISSUED outside the kernel.  [LineagePasses] below
-    is a Coq specification of the manuscript's Definition 13 (L1-L3) mirroring
-    the OCaml audit in legacy/exactness-2026/jurisdiction.ml BY INSPECTION; it
-    is not proved equivalent to that audit, and nothing here claims the
-    extracted OCaml audit constructs kernel-verified certificates.
+    SCOPE. LineageCheck.issue_certificate constructs a Coq record with
+    proofs of the implemented WF and L1-L3 conditions and empty declared
+    coverage gaps. Extraction erases these proofs and retains the record
+    data. The handwritten legacy OCaml audit is not proved equivalent to
+    the reflected checker; differential tests cover the stated overlap.
+    Disposition resolution, actual coverage and the truth of administrative
+    identifiers remain outside these implemented lineage guarantees.
     Identifiers (custodian, process, record) are opaque [nat]s: administrative
     facts that mathematics cannot infer. *)
 

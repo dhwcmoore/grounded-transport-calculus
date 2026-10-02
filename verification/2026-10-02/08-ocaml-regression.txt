@@ -1,0 +1,49 @@
+UTC start: 2026-10-02T21:09:45.208957+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['sh', '/workspace/scratch/7377e5310b4a/verification/pinned-source/extraction/run_lineage_regression.sh', '/workspace/scratch/7377e5310b4a/verification/regression']
+
+run_lineage_regression: compiled libraries from /workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default
+ocamlfind: [WARNING] Cannot read directory /usr/local/lib/ocaml/4.14.1/stublibs which is mentioned in ld.conf
+=== extracted lineage checker vs handwritten audit ===
+live rows                    extracted: L1=true L2=true L3=true grounded=true  handwritten: L1=true L2=true L3=true grounded=true  AGREE
+backfill rows                extracted: L1=true L2=true L3=true grounded=true  handwritten: L1=true L2=true L3=true grounded=true  AGREE
+backfill, zone undisclosed   extracted: L1=true L2=false L3=true grounded=false handwritten: L1=true L2=false L3=true grounded=false AGREE
+copied seam valuation        extracted: L1=false L2=true L3=false grounded=false handwritten: L1=false L2=true L3=false grounded=false AGREE
+cyclic record                extracted: Malformed:cycle                        handwritten: Malformed:cycle                        AGREE
+case study: 5/5 agree
+random differential: 1921/1921 agree (legacy-overlap only; 1079/3000 skipped)
+   malformed:relevant       41
+   grounded                 89
+   malformed:undeclared     640
+   not-grounded             846
+   malformed:duplicate      69
+   malformed:distinguished  65
+   malformed:cycle          171
+v6 ground=d_A rejected              PASS
+v6 ground=d_B rejected              PASS
+v6 raw ground accepted              PASS
+v6 raw ground certificate issued    PASS
+v6 ground=d_A no certificate        PASS
+v6 ground=d_B no certificate        PASS
+v6 edge cases: 6/6 pass
+=== stratified populations (intended outcome + handwritten flags) ===
+accepted                                   n=300  intended-verdict 300/300  handwritten-flags 300/300
+open (gaps)                                n=300  intended-verdict 300/300  handwritten-flags 300/300
+descent from d_A                           n=300  intended-verdict 300/300  handwritten-flags 300/300
+descent from d_B                           n=300  intended-verdict 300/300  handwritten-flags 300/300
+undisclosed shared                         n=300  intended-verdict 300/300  handwritten-flags 300/300
+no independent source                      n=300  intended-verdict 300/300  handwritten-flags 300/300
+malformed: duplicate                       n=300  intended-verdict 300/300  handwritten-flags 300/300
+malformed: undeclared                      n=300  intended-verdict 300/300  handwritten-flags 300/300
+malformed: distinguished                   n=300  intended-verdict 300/300  handwritten-flags 300/300
+malformed: relevant                        n=300  intended-verdict 300/300  handwritten-flags 300/300
+malformed: cycle                           n=300  intended-verdict 300/300  handwritten-flags 300/300
+deep: accepted (L3 source at depth >= 4)   n=300  intended-verdict 300/300  handwritten-flags 300/300
+deep: open (gaps)                          n=300  intended-verdict 300/300  handwritten-flags 300/300
+deep: descent from d_A (depth 4)           n=300  intended-verdict 300/300  handwritten-flags 300/300
+deep: descent from d_B (depth 4)           n=300  intended-verdict 300/300  handwritten-flags 300/300
+deep: undisclosed shared ancestor          n=300  intended-verdict 300/300  handwritten-flags 300/300
+deep: no independent source                n=300  intended-verdict 300/300  handwritten-flags 300/300
+
+Exit status: 0
+UTC finish: 2026-10-02T21:09:56.615098+00:00

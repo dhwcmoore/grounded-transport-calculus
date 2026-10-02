@@ -1,0 +1,28 @@
+UTC start: 2026-10-02T21:07:40.720441+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['sh', '-c', 'coqc --version; coqchk --version; ocamlc -version; dune --version; ocamlfind printconf']
+
+The Coq Proof Assistant, version 8.18.0
+compiled with OCaml 4.14.1
+The Coq Proof Checker, version 8.18.0
+4.14.1
+3.14.0
+Effective configuration:
+Configuration file:
+    /workspace/scratch/7377e5310b4a/toolchain/etc/ocamlfind.conf
+Search path:
+    /workspace/scratch/7377e5310b4a/toolchain/usr/lib/ocaml
+    /usr/local/lib/ocaml/4.14.1 (not found)
+    /usr/lib/ocaml (not found)
+    /usr/lib/ocaml/METAS (not found)
+Packages will be installed in/removed from:
+    /usr/local/lib/ocaml/4.14.1 (not found)
+META files will be installed in/removed from:
+    the corresponding package directories
+The standard library is assumed to reside in:
+    /workspace/scratch/7377e5310b4a/toolchain/usr/lib/ocaml
+The ld.conf file can be found here:
+    /usr/lib/ocaml/ld.conf
+
+Exit status: 0
+UTC finish: 2026-10-02T21:07:40.763368+00:00
