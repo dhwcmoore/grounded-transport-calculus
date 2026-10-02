@@ -47,12 +47,12 @@ calculus, statement unchanged), **new**, **conjectural**.
 | Regional obstruction; fork/order/quorum obstructions | existing, separate | - |
 
 | Certification / refutation soundness against the legacy `Transportable` (`TransportableFull`) | new | `Debt/TransportAssessment.v` |
-| Stratified regression (11 x 300) and 12-mutant study of the extracted checker | tested, NOT a theorem | `extraction/` |
+| Historical pre-V6 stratified regression (11 x 300) and 12-mutant study | tested, NOT a theorem | `extraction/` |
 
 | Two-level contexts: `CrossingProper`, `CertificateProper`, composition, chain, evidence lift (`ProblemMorphism`) | new | `Debt/CertificateProper.v` |
 | Certificate reissue; no evidence lift when grounding is lost | new (example) | `examples/CertificateReissue.v` |
 | Legacy vs full transportability: refutation soundness at the correct level | new | `Debt/TransportAssessment.v` |
-| Deep-ancestry populations; 13-mutant, per-suite study | tested, NOT a theorem | `extraction/` |
+| Historical pre-V6 deep-ancestry populations; 13-mutant, per-suite study | tested, NOT a theorem | `extraction/` |
 
 ## V6 lineage milestone (2026-09-29)
 
@@ -62,3 +62,6 @@ calculus, statement unchanged), **new**, **conjectural**.
 | L1 composes across consecutive coordinate pairs, for a fixed graph and ground | proved | `L1_at_composes` (`examples/LineageNonComposition.v`) |
 | L2 does not compose: AB and BC pass, AC fails only L2 | proved countermodel | `disclosure_noncomposition` |
 | L3 does not compose: AB and BC pass, AC fails only L3 | proved countermodel | `source_noncomposition` |
+
+| Current regression: 5 fixed cases; 1921 legacy-overlap random cases (1079 skipped); 3300 shallow; 1800 deep; six edge checks | tested, NOT a theorem | `extraction/` |
+| Current mutation union: 17/17; fixed 5, random 12, shallow 11, deep 8, edge 4; stratified union 13; M14--M17 detected only by edge | tested, NOT a theorem | `extraction/mutation_matrix.py` |

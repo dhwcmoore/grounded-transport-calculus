@@ -1,4 +1,4 @@
-# Status (2026-09-29, after the V6 lineage milestone)
+# Status (2026-10-02, submission verification)
 
 Reference environment: Coq 8.18.0, OCaml 4.14.1. Builds under `coq_makefile` and
 `dune build --root .`. `coqchk` passes on the whole project; on the project
@@ -6,10 +6,38 @@ without `ClassicalFactorisation.v` it succeeds and reports no axioms. `Print
 Assumptions` is "closed under the global context" for every theorem listed
 below except `constant_factors`.
 
+## Fresh pinned-revision verification (2026-10-02)
+
+Fresh checks at `e1e14a23a59906af0b14c556054133501a9b3612`, with all 120
+tracked blobs matched to GitHub's recursive commit tree, used Coq 8.18.0,
+OCaml 4.14.1, Dune 3.14.0 and Findlib 1.9.6. Dune and `coq_makefile`/Make
+builds passed. `coqchk` passed on all 36 non-classical project modules, and
+all 123 non-classical manuscript identifiers were closed under the global
+context. The separately checked `constant_factors` depends on
+`ClassicalEpsilon.constructive_indefinite_description` and
+`Classical_Prop.classic`; its file is isolated from the main closure.
+
+Regression reproduced 5/5 fixed cases, 1921/1921 legacy-overlap random cases
+(1079 of 3000 skipped), 3300/3300 shallow cases, 1800/1800 deep cases and six
+edge checks over three records. The mutation union detected 17/17; fixed,
+random, shallow, deep and edge detected 5, 12, 11, 8 and 4 respectively.
+The stratified union detected 13; M14--M17 were detected only by edge cases.
+The assessment consumer freshly reproduced custodian 7, record 1, ground
+node 5 and `LineagePass`. Its witness-summary calls use `Obj.magic` for
+dummy endpoints, so this consumer is not a coercion-free interface claim.
+
+See `verification/2026-10-02/` for commands, exit statuses, complete
+transcripts, cited identifiers and source/checksum manifests. These outcomes
+verify this pinned source, not a later manuscript or an unbound current
+Paper 2A artefact. Initial OCaml attempts exposed missing environment paths;
+after installing the matching runtime/library paths, the checks passed.
+
 ## V6 lineage milestone (2026-09-29)
 
-Branch `copied-agreement-v6-lineage`, verified at `6752b7f`; `main` is unchanged
-at `51284d0`. Figures in the older sections below predate this milestone.
+PR 4 is merged at `e1e14a23a59906af0b14c556054133501a9b3612`. Final PR verification
+was at `f70112dc204c4e2f4f514d8c24d3fa93af3783f0`, with the same source tree.
+The verification at `6752b7f` below is a historical checkpoint. Figures in
+the older sections predate the final milestone.
 
 **Lineage semantics (Copied Agreement v6, `f61dbae`).** `Debt/Certificates.v`
 and `Debt/LineageCheck.v` now implement:
@@ -22,7 +50,9 @@ and `Debt/LineageCheck.v` now implement:
 
 The identity clauses are needed because `Ancestor` is strict, and irreflexive on
 well-formed graphs, so descent alone does not exclude a ground equal to a
-coordinate. The checker reports the new defects `GroundEqualsA` and
+coordinate in L1 alone. This changes the clause and its diagnosis, not the
+set of fully passing derived-ground records solely because of identity:
+old L3 already excluded identity from a full pass. The checker reports the new defects `GroundEqualsA` and
 `GroundEqualsB` after well-formedness and before descent, and
 `ConstructionFailure` gains `LineageCoordinateIdentity`. The reflection theorems
 keep their names (`check_L1_reflect`, `check_L3_reflect`,

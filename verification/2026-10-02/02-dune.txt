@@ -1,0 +1,62 @@
+UTC start: 2026-10-02T21:07:40.763644+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['dune', 'build', '--root', '.', '--display', 'short']
+
+      coqdep examples/.GTCExamples.theory.d
+      coqdep legacy/exactness-2026/.Exactness.theory.d
+      coqdep theories/.GTC.theory.d
+        coqc theories/Core/GroundedTransport.{glob,vo}
+        coqc theories/Obstructions/FibreObstruction.{glob,vo}
+        coqc theories/Core/Erasure.{glob,vo}
+        coqc theories/Contexts/GroundedProper.{glob,vo}
+        coqc legacy/exactness-2026/Admissibility.{glob,vo}
+Closed under the global context
+Closed under the global context
+        coqc theories/Obstructions/LineageObstruction.{glob,vo}
+        coqc theories/Core/Composition.{glob,vo}
+        coqc theories/Obstructions/UngroundedAgreement.{glob,vo}
+        coqc theories/Contexts/ContextualPreservation.{glob,vo}
+        coqc theories/Debt/WarrantDebt.{glob,vo}
+        coqc theories/Instances/OriginalAdmissibility.{glob,vo}
+        coqc theories/Obstructions/ClassicalFactorisation.{glob,vo}
+        coqc theories/Instances/ExtensionalSeam.{glob,vo}
+        coqc theories/Debt/DebtClassifier.{glob,vo}
+        coqc legacy/exactness-2026/GroundedSeam.{glob,vo}
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+        coqc theories/Debt/OriginalObligations.{glob,vo}
+        coqc theories/Instances/OriginalGroundedSeamInstance.{glob,vo}
+        coqc theories/Debt/Certificates.{glob,vo}
+        coqc theories/Debt/Assessment.{glob,vo}
+        coqc examples/SeamTransport.{glob,vo}
+        coqc theories/Debt/EvidenceObligations.{glob,vo}
+        coqc theories/Instances/OriginalDynamicSeamInstance.{glob,vo}
+        coqc examples/LineageCertificates.{glob,vo}
+        coqc theories/Debt/MaintenanceDebt.{glob,vo}
+        coqc examples/EvolutionCoverage.{glob,vo}
+        coqc theories/Debt/GroundedWitness.{glob,vo}
+        coqc theories/Debt/PackedWarrant.{glob,vo}
+        coqc theories/Debt/LineageCheck.{glob,vo}
+        coqc theories/Debt/CertificateProper.{glob,vo}
+        coqc examples/DifferentWarrants.{glob,vo}
+        coqc examples/LineageChecked.{glob,vo}
+        coqc examples/LineageNonComposition.{glob,vo}
+        coqc theories/Debt/TransportAssessment.{glob,vo}
+        coqc theories/Debt/LineageAssessment.{glob,vo}
+        coqc examples/CopiedCoordinates.{glob,vo}
+        coqc examples/MaintenanceFailure.{glob,vo}
+        coqc examples/CertificateReissue.{glob,vo}
+evolution_crossing_proper Vok e01 ok_preserves
+     : CrossingProper (sp sys false) (vA Vok false) 
+         (vB Vok false) (vS Vok false) (sp sys true) 
+         (vA Vok true) (vB Vok true) (vS Vok true) 
+         (evo_state e01)
+
+Exit status: 0
+UTC finish: 2026-10-02T21:07:44.018041+00:00

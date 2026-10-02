@@ -1,0 +1,253 @@
+UTC start: 2026-10-02T21:08:11.995885+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['coqc', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/legacy/exactness-2026', 'Exactness', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/theories', 'GTC', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/examples', 'GTCExamples', '/workspace/scratch/7377e5310b4a/verification/Assumptions.v']
+
+BEGIN:CertificateProper
+Closed under the global context
+BEGIN:CrossingProper
+Closed under the global context
+BEGIN:GroundedProper
+Closed under the global context
+BEGIN:L1_at_composes
+Closed under the global context
+BEGIN:PackedWarrant
+Closed under the global context
+BEGIN:PreservesGroundingOnImage
+Closed under the global context
+BEGIN:ProblemMorphism
+Closed under the global context
+BEGIN:TransportableFull
+Closed under the global context
+BEGIN:TransportableLegacy
+Closed under the global context
+BEGIN:WEquiv_assoc
+Closed under the global context
+BEGIN:WEquiv_compose
+Closed under the global context
+BEGIN:WEquiv_id_left
+Closed under the global context
+BEGIN:WEquiv_id_right
+Closed under the global context
+BEGIN:WEquiv_summary
+Closed under the global context
+BEGIN:ancestors_complete
+Closed under the global context
+BEGIN:ancestors_iff
+Closed under the global context
+BEGIN:ancestors_sound
+Closed under the global context
+BEGIN:assemble_open_nonempty
+Closed under the global context
+BEGIN:assemble_refuted_reports_all
+Closed under the global context
+BEGIN:assemble_status
+Closed under the global context
+BEGIN:both_obstructions_reported
+Closed under the global context
+BEGIN:certificate_proper_comp
+Closed under the global context
+BEGIN:certificate_proper_erased
+Closed under the global context
+BEGIN:certificate_proper_id
+Closed under the global context
+BEGIN:certified_gives_transportable
+Closed under the global context
+BEGIN:certified_transportable
+Closed under the global context
+BEGIN:certified_transportable_legacy
+Closed under the global context
+BEGIN:check_L1_reflect
+Closed under the global context
+BEGIN:check_L3_reflect
+Closed under the global context
+BEGIN:contextual_chain
+Closed under the global context
+BEGIN:contextual_preservation
+Closed under the global context
+BEGIN:contextual_preservation_nested
+Closed under the global context
+BEGIN:copied_extensionally_coherent
+Closed under the global context
+BEGIN:copied_not_grounded
+Closed under the global context
+BEGIN:copied_not_grounded_from_generic
+Closed under the global context
+BEGIN:copied_ungrounded_agreement
+Closed under the global context
+BEGIN:crossing_proper_comp
+Closed under the global context
+BEGIN:crossing_proper_erased
+Closed under the global context
+BEGIN:crossing_proper_id
+Closed under the global context
+BEGIN:decidable_not_underdetermined
+Closed under the global context
+BEGIN:decided_certified_iff_transport
+Closed under the global context
+BEGIN:decided_refuted_iff_not_transport
+Closed under the global context
+BEGIN:defect_sound
+Closed under the global context
+BEGIN:disclosure_noncomposition
+Closed under the global context
+BEGIN:dynamic_failure_visible
+Closed under the global context
+BEGIN:each_obstruction_refutes
+Closed under the global context
+BEGIN:erase_packed
+Closed under the global context
+BEGIN:erase_sound
+Closed under the global context
+BEGIN:erased_PreOrder
+Closed under the global context
+BEGIN:erasure_exact_of_complete
+Closed under the global context
+BEGIN:erasure_not_reflecting
+Closed under the global context
+BEGIN:erasure_sound
+Closed under the global context
+BEGIN:evo_state_compose
+Closed under the global context
+BEGIN:evo_state_id
+Closed under the global context
+BEGIN:evolution_compose_grounded_proper
+Closed under the global context
+BEGIN:evolution_compose_via_gp_comp
+Closed under the global context
+BEGIN:evolution_crossing_proper
+Closed under the global context
+BEGIN:extensional_conclusion_survives_ungrounded
+Closed under the global context
+BEGIN:extensional_factor_transport
+Closed under the global context
+BEGIN:fibre_obstruction
+Closed under the global context
+BEGIN:full_iff_legacy_and_authority
+Closed under the global context
+BEGIN:full_implies_legacy
+Closed under the global context
+BEGIN:gp_comp
+Closed under the global context
+BEGIN:gp_id
+Closed under the global context
+BEGIN:grounded_factor_transport
+Closed under the global context
+BEGIN:grounded_proper_Proper
+Closed under the global context
+BEGIN:grounded_proper_compose
+Closed under the global context
+BEGIN:grounded_proper_erased
+Closed under the global context
+BEGIN:grounded_proper_sound
+Closed under the global context
+BEGIN:grounded_transport_compose
+Closed under the global context
+BEGIN:grounded_transport_refl
+Closed under the global context
+BEGIN:grounding_at_transported_elements
+Closed under the global context
+BEGIN:institutional_refutes_full
+Closed under the global context
+BEGIN:issue_certificate
+Closed under the global context
+BEGIN:issue_certificate_data
+Closed under the global context
+BEGIN:issue_certificate_iff
+Closed under the global context
+BEGIN:lift_gives_grounding
+Closed under the global context
+BEGIN:lineage_check_open
+Closed under the global context
+BEGIN:lineage_check_reflect
+Closed under the global context
+BEGIN:lineage_check_rejected
+Closed under the global context
+BEGIN:lineage_defect_none_iff
+Closed under the global context
+BEGIN:located_refutes
+Closed under the global context
+BEGIN:located_refutes_legacy
+Closed under the global context
+BEGIN:located_refutes_transportable
+Closed under the global context
+BEGIN:natural_compose
+Closed under the global context
+BEGIN:natural_id
+Closed under the global context
+BEGIN:natural_valuations_preserve_grounding_on_image
+Closed under the global context
+BEGIN:no_evidence_lift_when_grounding_lost
+Closed under the global context
+BEGIN:not_complete_of_gap
+Closed under the global context
+BEGIN:not_proper_of_distinguished
+Closed under the global context
+BEGIN:obs_equiv_not_transport
+Closed under the global context
+BEGIN:observational_not_grounded
+Closed under the global context
+BEGIN:obstructions_refute
+Closed under the global context
+BEGIN:opath_inv
+Closed under the global context
+BEGIN:ordinary_rewriting_still_succeeds
+Closed under the global context
+BEGIN:original_copied_counterexample_embeds
+Closed under the global context
+BEGIN:original_grounding_erases_to_extensional
+Closed under the global context
+BEGIN:original_grounding_preserving_evolution_is_grounded_proper
+Closed under the global context
+BEGIN:original_seam_transport_from_generic
+Closed under the global context
+BEGIN:packed_distinguishable
+Closed under the global context
+BEGIN:packed_warrants_same_endpoints
+Closed under the global context
+BEGIN:pairwise_agreement_not_grounding
+Closed under the global context
+BEGIN:pm_certificate_proper
+Closed under the global context
+BEGIN:pm_commute
+Closed under the global context
+BEGIN:pm_crossing_proper
+Closed under the global context
+BEGIN:preorder_complete
+Closed under the global context
+BEGIN:preservation_without_coverage
+Closed under the global context
+BEGIN:refuted_not_transportable
+Closed under the global context
+BEGIN:refuted_verdict_keeps_open_item
+Closed under the global context
+BEGIN:reissue_certificate_proper
+Closed under the global context
+BEGIN:report_accounts_for_all
+Closed under the global context
+BEGIN:report_verdict_agrees
+Closed under the global context
+BEGIN:rpath_forget
+Closed under the global context
+BEGIN:rpath_sound
+Closed under the global context
+BEGIN:same_endpoints_different_warrants
+Closed under the global context
+BEGIN:seam_transport
+Closed under the global context
+BEGIN:source_noncomposition
+Closed under the global context
+BEGIN:structural_naturality_not_preservation
+Closed under the global context
+BEGIN:surjective_evolution_preserves_all_grounding
+Closed under the global context
+BEGIN:trace_not_determined_by_copied_value
+Closed under the global context
+BEGIN:undisclosed_none_iff
+Closed under the global context
+BEGIN:warrant_summary
+Closed under the global context
+BEGIN:wf_defect_none_iff
+Closed under the global context
+
+Exit status: 0
+UTC finish: 2026-10-02T21:08:19.028584+00:00

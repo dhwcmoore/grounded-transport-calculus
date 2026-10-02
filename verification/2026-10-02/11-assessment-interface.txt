@@ -1,0 +1,7 @@
+UTC start: 2026-10-02T21:12:41.886859+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/assessment
+Command: ['ocamlc', '-c', 'assessment_extracted.mli']
+
+
+Exit status: 0
+UTC finish: 2026-10-02T21:12:41.895989+00:00

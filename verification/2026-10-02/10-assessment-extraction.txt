@@ -1,0 +1,7 @@
+UTC start: 2026-10-02T21:12:41.647799+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/assessment
+Command: ['coqc', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/legacy/exactness-2026', 'Exactness', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/theories', 'GTC', '-R', '/workspace/scratch/7377e5310b4a/verification/pinned-source/_build/default/examples', 'GTCExamples', 'ExtractAssessment.v']
+
+
+Exit status: 0
+UTC finish: 2026-10-02T21:12:41.886514+00:00

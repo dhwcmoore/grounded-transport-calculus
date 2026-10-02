@@ -40,7 +40,11 @@ python3 extraction/mutation_matrix.py "$WORK"
 The regression script can be run from any directory. It reads the compiled
 libraries from `_build/default` when a Dune build exists and from the source
 tree otherwise (a `coq_makefile` build); set `GTC_LIBROOT` to choose
-explicitly. `STATUS.md` records the current results.
+explicitly. `STATUS.md` records the current results. The pinned formal revision is
+`e1e14a23a59906af0b14c556054133501a9b3612`; PR 4 is merged. A single
+`coqchk` invocation on `LineageNonComposition` checks that module and its
+dependency closure, not all 36 non-classical project modules. The complete
+36-module pass and 123-identifier assumption audit are recorded separately.
 
 ## Layout
 
@@ -59,3 +63,11 @@ explicitly. `STATUS.md` records the current results.
 | `milestones/` | frozen, checksummed snapshots of earlier states |
 
 See `STATUS.md` for what is proved, what is recovered from the legacy supplement, and what is open.
+
+## Manuscript and reviewer release
+
+The bundled LMCS manuscript records an earlier layout; the current intended
+submission venue is the Journal of Logic and Computation. No arXiv upload is
+needed to reproduce the artefact. A Git commit fixes the source revision;
+a reviewer archive still needs a published persistent identifier. Do not cite
+a DOI until the archive has been deposited and its public retrieval checked.

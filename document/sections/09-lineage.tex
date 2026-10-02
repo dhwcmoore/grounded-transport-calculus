@@ -17,7 +17,7 @@ $\mathsf{WF}(g)$ holds iff: (1) $\mathsf{nodes}(g)$ is duplicate-free; (2) every
 \end{description}
 $\mathsf{LineagePasses}(g) :\equiv \mathsf{WF}(g) \wedge \mathrm{L1} \wedge \mathrm{L2} \wedge \mathrm{L3}$.
 \end{defi}
-\paragraph{Status of L1--L3.} These conditions are \emph{declared specifications}, not derived results. They formalise three intelligible requirements on what it means for a seam valuation to be grounded independently of the coordinates it grounds: it must be neither one of them nor descended from them (L1), any ancestry it shares with them must be disclosed (L2), and it must draw on at least one claim-relevant source, possibly itself, that they do not (L3). We do not prove that they are necessary or sufficient for every adequate notion of grounding, and a different regime could adopt different conditions. What is proved is what the calculus needs of them: the copy pattern of \cref{sec:example} violates L1, and the checker below decides exactly these conditions.
+\paragraph{Status of L1--L3.} These conditions are \emph{declared specifications}, not derived results. They formalise three intelligible requirements on what it means for a seam valuation to be grounded independently of the coordinates it grounds: it must be neither one of them nor descended from them (L1), shared non-raw ancestry of the two coordinates must have a declared disposition (L2), and it must draw on at least one claim-relevant source, possibly itself, that they do not (L3). We do not prove that they are necessary or sufficient for every adequate notion of grounding, and a different regime could adopt different conditions. What is proved is what the calculus needs of them: the copy pattern of \cref{sec:example} violates L1, and the checker below decides exactly these conditions.
 
 \paragraph{Coordinates and ground.} Clause (3) of $\mathsf{WF}$ requires the coordinates $d_A$ and $d_B$ to be derived but requires the ground $\gamma$ only to be a declared node, so a raw input may serve as the ground. L3 accordingly ranges over $\gamma$ together with its strict ancestors, so that such a ground can be its own independent source. The identity clauses of L1 are not redundant: $\mathrm{Anc}_g$ is strict, and irreflexive under clause (5), so without them a ground equal to $d_A$ or $d_B$ would pass the descent test.
 
@@ -108,7 +108,7 @@ There is a function $\mathsf{issue}(g,\varkappa) \in \mathsf{Option}(\mathsf{Lin
 \begin{proof}
 Define $\mathsf{issue}$ by cases on $\mathsf{defect}(g)$ and $\mathsf{gaps}(\varkappa)$; in the accepting case build the record from $g$, $\varkappa$, the verdict $\mathsf{Pass}$, and the proofs of $\mathsf{WF}$, L1, L2, L3 supplied by \cref{lem:defectnone} and the empty gaps. The iff is \cref{thm:reflect}.
 \end{proof}
-Acceptance thus constructs a kernel-checked certificate. This is strictly stronger than an audit that prints a verdict: the extracted checker returns a value whose type records that the graph passes.
+Acceptance constructs a proof-bearing certificate in Coq. Extraction retains its graph, coverage and verdict, and erases the proof fields. The OCaml value does not independently carry a kernel-checkable proof; its correctness relies on the reflected Coq issuer and the trusted extraction and execution boundary.
 
 \subsection{Pairwise audits do not compose}\label{sec:noncompose}
 For a fixed lineage graph and fixed ground, L1 composes across consecutive coordinate pairs. L2 and L3 do not compose in general. Pairwise accepted lineage audits therefore do not certify the outer coordinate pair.

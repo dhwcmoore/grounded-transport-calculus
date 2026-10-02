@@ -1,0 +1,11 @@
+UTC start: 2026-10-02T21:08:19.209287+00:00
+Working directory: /workspace/scratch/7377e5310b4a/verification/pinned-source
+Command: ['coq_makefile', '-f', '_CoqProject', '-o', 'Makefile.coq']
+
+Warning: No common logical root.
+Warning: In this case the -docroot option should be given.
+Warning: Otherwise the install-doc target is going to install files
+Warning: in orphan_Exactness_GTC_GTCExamples
+
+Exit status: 0
+UTC finish: 2026-10-02T21:08:19.213814+00:00
